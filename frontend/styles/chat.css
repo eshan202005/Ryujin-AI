@@ -1,0 +1,89 @@
+/* ==========================================================
+CHAT CONTAINER
+========================================================== */
+
+[data-testid="stChatMessage"]{
+
+    background:var(--glass);
+
+    backdrop-filter:blur(22px);
+
+    -webkit-backdrop-filter:blur(22px);
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    margin-bottom:18px;
+
+    box-shadow:var(--shadow);
+
+}
+
+/* ==========================================================
+USER MESSAGE
+========================================================== */
+
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]){
+
+    background:rgba(124,58,237,.15);
+
+}
+
+/* ==========================================================
+ASSISTANT MESSAGE
+========================================================== */
+
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]){
+
+    background:rgba(18,18,28,.42);
+
+}
+
+/* ==========================================================
+MARKDOWN
+========================================================== */
+
+[data-testid="stMarkdownContainer"]{
+
+    font-size:15px;
+
+    line-height:1.8;
+
+}
+
+/* ==========================================================
+CODE
+========================================================== */
+
+pre{
+
+    border-radius:16px!important;
+
+    border:1px solid rgba(255,255,255,.08);
+
+}
+
+/* ==========================================================
+INLINE CODE
+========================================================== */
+
+code{
+
+    border-radius:8px;
+
+}
+
+/* ==========================================================
+TABLES
+========================================================== */
+
+table{
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+}

@@ -1,0 +1,159 @@
+/* ==========================================================
+SIDEBAR PANEL
+========================================================== */
+
+section[data-testid="stSidebar"]{
+
+    background:rgba(10,10,18,.38)!important;
+
+    backdrop-filter:blur(30px);
+
+    -webkit-backdrop-filter:blur(30px);
+
+    border-right:1px solid rgba(255,255,255,.06);
+
+    box-shadow:
+        8px 0 35px rgba(0,0,0,.30);
+
+    min-width:285px!important;
+
+    max-width:285px!important;
+}
+
+/* Sidebar Content */
+
+section[data-testid="stSidebar"] > div{
+
+    padding:18px 18px;
+
+}
+
+/* ==========================================================
+LOGO
+========================================================== */
+
+.logo-title{
+
+    font-size:31px;
+
+    font-weight:700;
+
+    letter-spacing:.2px;
+
+    line-height:1.05;
+
+}
+
+.logo-ai{
+
+    color:var(--primary-light);
+
+}
+
+.logo-subtitle{
+
+    color:#B3B8C7;
+
+    font-size:13px;
+
+    margin-top:5px;
+
+}
+
+/* ==========================================================
+NEW CHAT BUTTON
+========================================================== */
+
+section[data-testid="stSidebar"] .stButton>button{
+
+    width:100%;
+
+    height:54px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-light)
+        );
+
+    color:white;
+
+    font-weight:600;
+
+    font-size:15px;
+
+    transition:.25s;
+
+}
+
+section[data-testid="stSidebar"] .stButton>button:hover{
+
+    transform:
+        translateY(-2px)
+        scale(1.01);
+
+    box-shadow:
+        0 0 28px rgba(168,85,247,.35);
+
+}
+
+/* ==========================================================
+SECTION TITLES
+========================================================== */
+
+.sidebar-section{
+
+    color:#8F95A3;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    letter-spacing:1.5px;   
+
+    margin-top:18px;         
+
+    margin-bottom:10px;      
+
+    text-transform:uppercase;
+
+}
+
+/* ==========================================================
+EMPTY CARD
+========================================================== */
+
+.empty-card{
+
+    padding:16px;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.06);
+
+    color:#AEB4C3;
+
+    font-size:14px;
+
+}
+
+/* ==========================================================
+DIVIDER
+========================================================== */
+
+hr{
+
+    border:none;
+
+    border-top:1px solid rgba(255,255,255,.05);
+
+    margin:12px 0;
+
+}

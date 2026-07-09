@@ -1,0 +1,234 @@
+/* ==========================================================
+RYUJIN AI THEME
+========================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&display=swap");
+
+/* ==========================================================
+ROOT VARIABLES
+========================================================== */
+
+:root{
+
+    /* ---------- COLORS ---------- */
+
+    --bg:#09090F;
+
+    --surface:#12121A;
+
+    --surface-light:#1A1A25;
+
+    --glass:rgba(18,18,28,.38);
+
+    --glass-strong:rgba(18,18,28,.55);
+
+    --glass-hover:rgba(30,30,42,.52);
+
+    --primary:#7C3AED;
+
+    --primary-light:#A855F7;
+
+    --primary-dark:#5B21B6;
+
+    --accent:#C084FC;
+
+    --border:rgba(168,85,247,.18);
+
+    --border-light:rgba(255,255,255,.08);
+
+    --text:#FFFFFF;
+
+    --text-secondary:#BEBEC7;
+
+    --text-muted:#8E8E98;
+
+    --success:#10B981;
+
+    --warning:#F59E0B;
+
+    --danger:#EF4444;
+
+    /* ---------- SHADOWS ---------- */
+
+    --shadow-sm:
+        0 4px 12px rgba(0,0,0,.18);
+
+    --shadow:
+
+        0 10px 30px rgba(0,0,0,.28);
+
+    --shadow-lg:
+
+        0 20px 60px rgba(0,0,0,.45);
+
+    --purple-glow:
+
+        0 0 30px rgba(168,85,247,.28);
+
+    /* ---------- RADIUS ---------- */
+
+    --radius-sm:10px;
+
+    --radius:18px;
+
+    --radius-lg:26px;
+
+    --radius-xl:34px;
+
+    /* ---------- SPACING ---------- */
+
+    --space-xs:6px;
+
+    --space-sm:10px;
+
+    --space-md:16px;
+
+    --space-lg:24px;
+
+    --space-xl:36px;
+
+    --space-2xl:52px;
+
+}
+
+/* ==========================================================
+GLOBAL RESET
+========================================================== */
+
+html,
+body,
+[class*="css"]{
+
+    font-family:"Geist",sans-serif;
+
+    color:var(--text);
+
+}
+
+/* ==========================================================
+STREAMLIT
+========================================================== */
+
+#MainMenu{
+
+    visibility:hidden;
+}
+
+footer{
+
+    visibility:hidden;
+}
+
+/*
+Hide after deployment
+
+header{
+
+visibility:hidden;
+
+}
+*/
+
+/* ==========================================================
+TEXT
+========================================================== */
+
+h1{
+
+    color:var(--text)!important;
+
+    font-size:46px!important;
+
+    font-weight:700!important;
+
+}
+
+h2{
+
+    color:var(--text)!important;
+
+}
+
+h3{
+
+    color:var(--text)!important;
+
+}
+
+h4{
+
+    color:var(--text)!important;
+
+}
+
+p{
+
+    color:var(--text-secondary);
+
+}
+
+small{
+
+    color:var(--text-muted);
+
+}
+
+/* ==========================================================
+LINKS
+========================================================== */
+
+a{
+
+    color:var(--primary-light);
+
+    text-decoration:none;
+
+}
+
+a:hover{
+
+    color:white;
+
+}
+
+/* ==========================================================
+SELECTION
+========================================================== */
+
+::selection{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+/* ==========================================================
+SCROLLBAR
+========================================================== */
+
+::-webkit-scrollbar{
+
+    width:9px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:transparent;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:var(--primary);
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:var(--primary-light);
+
+}
