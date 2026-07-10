@@ -15,7 +15,7 @@ def render_sidebar():
     )
 
     with logo:
-        show_logo(width=80)
+        show_logo(width=90)
 
     with text:
 

@@ -1,42 +1,81 @@
 import streamlit as st
 
 
-WELCOME_MESSAGE = """
-# 👋 Welcome to Ryujin AI
+# ==========================================================
+# WELCOME SCREEN
+# ==========================================================
 
-I'm your **intelligent multi-agent AI assistant**.
+def render_welcome():
 
-Soon I'll be able to:
+    st.markdown(
+        """
+<div class="welcome-card">
 
-- 🧠 Route tasks using a LangGraph Supervisor
-- 📄 Chat with your uploaded documents
-- 🌐 Search the web
-- 🧩 Use tools dynamically
-- 💾 Remember previous conversations
-- ⚡ Stream responses in real time
+<h2>Welcome to Ryujin AI</h2>
 
-Ask me anything to get started.
-"""
+<p class="welcome-subtitle">
+Your intelligent multi-agent assistant.
+</p>
 
+<p class="welcome-description">
+Ryujin automatically selects the best agents and tools
+for every request.
+</p>
 
-def initialize_chat():
+<div class="capability-list">
 
-    if "messages" not in st.session_state:
+<div class="capability-item">
+🧠 <span>Research</span>
+</div>
 
-        st.session_state.messages = [
-            {
-                "role": "assistant",
-                "content": WELCOME_MESSAGE,
-            }
-        ]
+<div class="capability-item">
+💻 <span>Coding</span>
+</div>
 
+<div class="capability-item">
+📄 <span>Resume Chat</span>
+</div>
 
-def render_chat():
+<div class="capability-item">
+🌐 <span>Web Search</span>
+</div>
 
-    initialize_chat()
+<div class="capability-item">
+⚡ <span>AI Workflows</span>
+</div>
+
+</div>
+
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+# ==========================================================
+# CHAT MESSAGES
+# ==========================================================
+
+def render_messages():
 
     for message in st.session_state.messages:
 
-        with st.chat_message(message["role"]):
+        avatar = "👤" if message["role"] == "user" else "🐉"
+
+        with st.chat_message(
+            message["role"],
+            avatar=avatar,
+        ):
 
             st.markdown(message["content"])
+
+
+# ==========================================================
+# MAIN CHAT
+# ==========================================================
+
+def render_chat():
+
+    if len(st.session_state.messages) == 0:
+
+        render_welcome()
+
+    render_messages()

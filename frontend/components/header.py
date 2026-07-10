@@ -1,5 +1,4 @@
 from datetime import datetime
-
 import streamlit as st
 
 
@@ -8,23 +7,38 @@ def get_greeting():
     hour = datetime.now().hour
 
     if 5 <= hour < 12:
-        return "Good Morning ☀️"
+        greeting = "Good Morning"
 
     elif 12 <= hour < 17:
-        return "Good Afternoon 👋"
+        greeting = "Good Afternoon"
 
     elif 17 <= hour < 22:
-        return "Good Evening 🌙"
+        greeting = "Good Evening"
 
-    return "Working Late 🌌"
+    else:
+        greeting = "Good Evening"
+
+    return greeting
 
 
 def render_header():
 
-    st.title(get_greeting())
+    if len(st.session_state.messages) > 0:
+        return
 
-    st.caption(
-        "What shall we build today?"
+    st.markdown(
+        f"""
+<div class="hero">
+
+<div class="hero-title">
+{get_greeting()}, Eshan 👋
+</div>
+
+<div class="hero-subtitle">
+What shall we build today?
+</div>
+
+</div>
+""",
+        unsafe_allow_html=True,
     )
-
-    st.markdown("<br>", unsafe_allow_html=True)
