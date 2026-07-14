@@ -17,3 +17,6 @@ async def chat_endpoint(request: ChatRequest):
     return ChatResponse(
         response=response
     )
+@router.post("/stream")
+async def stream_chat_endpoint():
+    pass

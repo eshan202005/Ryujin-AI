@@ -50,13 +50,15 @@ for every request.
 """,
         unsafe_allow_html=True,
     )
+
+
 # ==========================================================
 # CHAT MESSAGES
 # ==========================================================
 
-def render_messages():
+def render_messages(messages):
 
-    for message in st.session_state.messages:
+    for message in messages:
 
         avatar = "👤" if message["role"] == "user" else "🐉"
 
@@ -64,7 +66,6 @@ def render_messages():
             message["role"],
             avatar=avatar,
         ):
-
             st.markdown(message["content"])
 
 
@@ -74,8 +75,25 @@ def render_messages():
 
 def render_chat():
 
-    if len(st.session_state.messages) == 0:
+    current_thread = st.session_state.current_thread
 
+    # No conversation selected yet
+    if current_thread is None:
         render_welcome()
+        return
 
-    render_messages()
+    conversation = st.session_state.conversations[current_thread]
+
+    messages = conversation["messages"]
+
+    # Empty conversation
+    if len(messages) == 0:
+        render_welcome()
+        return
+
+    # Render messages
+    render_messages(messages)
+
+    if st.session_state.is_generating:
+        with st.chat_message("assistant", avatar="🐉"):
+            st.spinner("Ryujin is thinking...")

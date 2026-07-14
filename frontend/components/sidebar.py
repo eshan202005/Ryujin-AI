@@ -1,8 +1,11 @@
 import streamlit as st
+from utils.conversation import create_conversation
 from utils.helpers import show_logo
 
 
+
 def render_sidebar():
+    
 
     # ======================================================
     # LOGO
@@ -43,11 +46,13 @@ Building Intelligence
     # NEW CHAT
     # ======================================================
 
-    st.button(
+    if st.button(
         "➕  New Chat",
         use_container_width=True,
         type="primary",
-    )
+    ):
+        st.session_state.current_thread = None
+        st.rerun()
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
@@ -60,7 +65,7 @@ Building Intelligence
         unsafe_allow_html=True,
     )
 
-    if not st.session_state.threads:
+    if not st.session_state.conversations:
 
         st.markdown(
             """

@@ -21,3 +21,22 @@ async def chat(message: str, thread_id: str) -> str:
     )
 
     return result["messages"][-1].content
+
+
+async def stream_chat(message: str,thread_id: str,):
+    config = {
+        "configurable": {
+            "thread_id": thread_id
+        }
+    }
+
+    async for chunk in chat_graph.astream(
+        {
+            "messages": [
+                HumanMessage(content=message)
+            ]
+        },
+        config=config,
+    ):
+
+        print(chunk)
