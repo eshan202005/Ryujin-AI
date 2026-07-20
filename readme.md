@@ -53,7 +53,7 @@ Ryujin is designed to provide a seamless AI experience where users simply descri
 
 ## 🎯 Vision
 
-Ryujin AI aims to become an intelligent AI platform capable of:
+Ryujin AI aims to become an intelligent AI platform capable :
 
 - 🧠 Research
 - 💻 Coding Assistance
