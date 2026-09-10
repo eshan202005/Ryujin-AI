@@ -1,6 +1,6 @@
 import streamlit as st
 
-from utils.api import chat
+
 from utils.conversation import create_conversation
 
 

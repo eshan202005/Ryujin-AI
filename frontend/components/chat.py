@@ -60,6 +60,10 @@ def render_messages(messages):
 
     for message in messages:
 
+        # Skip empty messages
+        if not message["content"]:
+            continue
+
         avatar = "👤" if message["role"] == "user" else "🐉"
 
         with st.chat_message(
@@ -93,7 +97,3 @@ def render_chat():
 
     # Render messages
     render_messages(messages)
-
-    if st.session_state.is_generating:
-        with st.chat_message("assistant", avatar="🐉"):
-            st.spinner("Ryujin is thinking...")

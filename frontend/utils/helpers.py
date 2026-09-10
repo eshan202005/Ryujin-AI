@@ -90,8 +90,8 @@ def set_background():
 .stApp{{
 background:
 linear-gradient(
-rgba(4,4,8,.82),
-rgba(8,6,16,.90)
+rgba(4,4,8,.40),
+rgba(8,6,16,.40)
 ),
 url("data:image/png;base64,{img}");
 

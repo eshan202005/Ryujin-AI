@@ -1,10 +1,9 @@
 import streamlit as st
 
-from utils.api import chat
+from utils.api import stream_chat
 
 
 def process_pending_prompt():
-
     if not st.session_state.is_generating:
         return
 
@@ -17,10 +16,13 @@ def process_pending_prompt():
         st.session_state.current_thread
     ]
 
-    response = chat(
-        message=prompt,
-        thread_id=conversation["thread_id"],
-    )
+    with st.chat_message("assistant"):
+        response = st.write_stream(
+            stream_chat(
+                message=prompt,
+                thread_id=conversation["thread_id"],
+            )
+        )
 
     conversation["messages"].append(
         {
@@ -31,5 +33,3 @@ def process_pending_prompt():
 
     st.session_state.pending_prompt = None
     st.session_state.is_generating = False
-
-    st.rerun()

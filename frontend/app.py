@@ -52,13 +52,7 @@ if "pending_prompt" not in st.session_state:
 with st.sidebar:
     render_sidebar()
 
-# ==========================================================
-# MAIN PAGE
-# ==========================================================
-
 render_header()
-
 render_chat()
-
-render_input()
 process_pending_prompt()
+render_input()
