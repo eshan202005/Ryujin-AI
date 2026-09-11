@@ -1,0 +1,955 @@
+RYUJIN AI — PROJECT DOCUMENTATION
+====================================
+Current checkpoint: Day 6 — Streaming Chat
+This is the living engineering reference for the Ryujin AI project.
+
+1. PROJECT GOAL
+---------------
+Ryujin AI is intended to become a production-style multi-agent AI workspace.
+
+Core idea:
+The user describes a task naturally. Ryujin's Supervisor decides which agent and
+tools should handle the task, then executes the appropriate workflow.
+
+Long-term:
+User -> Streamlit -> FastAPI -> Supervisor -> Specialized Agent -> Subgraph
+-> Tools/RAG -> Result -> Streaming -> Streamlit
+
+Planned agents:
+1. Research
+2. Coding
+3. Writing
+4. Study
+5. General Chat
+
+2. CURRENT ARCHITECTURE
+-----------------------
+CURRENTLY IMPLEMENTED:
+
+User
+  |
+  v
+Streamlit UI
+  |
+  v
+FastAPI
+  |
+  v
+LangGraph chat_graph
+  |
+  v
+chat_agent
+  |
+  v
+ChatOpenAI
+  |
+  v
+Streaming response
+  |
+  v
+Streamlit
+
+FINAL INTENDED ARCHITECTURE:
+
+User
+  |
+  v
+Streamlit
+  |
+  v
+FastAPI
+  |
+  v
+Supervisor
+  |
+  +--> Research Agent --> Research Subgraph --> Tools/RAG
+  +--> Coding Agent  --> Coding Subgraph  --> Tools/RAG
+  +--> Writing Agent --> Writing Subgraph --> Tools/RAG
+  +--> Study Agent   --> Study Subgraph   --> Tools/RAG
+  +--> General Agent --> General Subgraph
+  |
+  v
+Response -> Streaming -> Streamlit
+
+Mental model:
+Supervisor = WHO handles the task
+Agent = WHAT capability
+Subgraph = HOW the capability executes
+RAG = retrieval/knowledge capability
+Tools/MCP = external capabilities
+Checkpointer = workflow/conversation state
+thread_id = conversation identity
+
+3. CURRENT TECH STACK
+---------------------
+Frontend:
+- Streamlit
+- HTML/CSS
+- st.chat_message
+- st.write_stream
+
+Backend:
+- FastAPI
+- Pydantic
+- Uvicorn
+
+AI/orchestration:
+- LangGraph
+- LangChain Core
+- LangChain OpenAI
+- ChatOpenAI
+
+Persistence:
+- SQLite
+- aiosqlite
+- langgraph-checkpoint-sqlite
+- AsyncSqliteSaver
+
+Other/future:
+- ChromaDB
+- OpenAI embeddings
+- PyPDFLoader
+- RecursiveCharacterTextSplitter
+- PostgreSQL/Neon
+- LangSmith
+- Tools/MCP
+
+4. CURRENT RELEVANT FILE STRUCTURE
+----------------------------------
+Ryujin AI/
+  frontend/
+    app.py
+    components/
+      sidebar.py
+      header.py
+      chat.py
+      input.py
+    utils/
+      api.py
+      chat_processor.py
+      conversation.py
+      helpers.py
+
+  backend/
+    main.py
+    models.py
+    routers/
+      root.py
+      chat.py
+    services/
+      chat_service.py
+    graphs/
+      state.py
+      chat_graph.py
+      checkpointer.py
+
+  styles/
+    theme.css
+    layout.css
+    sidebar.css
+    chat.css
+    input.css
+    animations.css
+
+  assets/
+    background.jpg
+    logo.png
+
+  ryujin.db
+  requirements.txt
+
+5. CURRENT LANGGRAPH STATE
+---------------------------
+Current state:
+
+class RyujinState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]
+
+State is the shared "backpack" containing messages.
+
+add_messages merges new messages into the existing message list.
+
+The state is intentionally minimal right now.
+
+Possible future fields:
+- current_agent
+- files
+- retrieved_context
+- tool_results
+- workflow/task status
+- artifacts
+
+Only add fields when needed.
+
+6. CURRENT PERSISTENCE
+----------------------
+Persistence is currently conversation/thread scoped.
+
+Example:
+
+Chat A:
+  thread_id = A
+  history = A
+
+Chat B:
+  thread_id = B
+  history = B
+
+The LangGraph checkpointer stores graph state associated with thread_id.
+
+Current architecture:
+
+Main graph
+   |
+   v
+SQLite checkpointer
+   |
+   v
+thread_id
+   |
+   v
+conversation state
+
+IMPORTANT:
+This is NOT global user memory.
+
+If the user says in Chat A:
+"My name is Eshan."
+
+and creates Chat B, asking:
+"What is my name?"
+
+Chat B will not automatically know the answer simply because Chat A knew it.
+
+That is expected under the current design.
+
+7. CONVERSATION STATE VS GLOBAL MEMORY
+--------------------------------------
+These concepts must remain separate.
+
+Conversation state:
+What happened in one chat/thread.
+
+Task/workflow state:
+Where a particular workflow currently is.
+
+Artifacts/results:
+Outputs produced by previous tasks.
+
+Global/user memory:
+Facts or preferences intentionally available across chats.
+
+Current Ryujin has conversation state through thread_id/checkpointing.
+Global memory is planned for later.
+
+8. FRONTEND SESSION STATE
+-------------------------
+Current frontend state includes:
+
+st.session_state.conversations
+st.session_state.current_thread
+st.session_state.is_generating
+st.session_state.pending_prompt
+
+Conversation shape:
+
+{
+    "thread_id": "...",
+    "name": "New Chat",
+    "messages": [],
+    "files": []
+}
+
+Important:
+Streamlit session_state and LangGraph SQLite persistence are separate layers.
+
+If Streamlit restarts, session_state is lost while SQLite checkpoints can remain.
+
+Persistent sidebar loading/resume functionality is not complete yet.
+
+9. EXACT QUERY FLOW
+-------------------
+Example:
+User types: "Explain LangGraph simply."
+
+STEP 1 — User input
+The Streamlit chat input receives the prompt.
+
+If there is no active conversation, create_conversation() creates a UUID thread_id.
+
+The user message is added to the frontend conversation.
+
+pending_prompt is set.
+is_generating is set to True.
+
+A Streamlit rerun occurs.
+
+STEP 2 — Render current chat
+Streamlit renders the sidebar, header and current conversation.
+
+render_chat() reads the active thread and its messages.
+
+Empty messages are skipped so stale empty assistant placeholders are not shown.
+
+STEP 3 — Process pending prompt
+process_pending_prompt() sees that generation is active and retrieves:
+- prompt
+- current conversation
+- thread_id
+
+STEP 4 — Call streaming API
+frontend/utils/api.py sends:
+
+POST http://127.0.0.1:8000/chat/stream
+
+JSON:
+{
+    "message": "...",
+    "thread_id": "..."
+}
+
+The request uses stream=True.
+
+STEP 5 — FastAPI
+The /chat/stream route receives ChatRequest and returns StreamingResponse.
+
+STEP 6 — Backend service
+chat_service.stream_chat() creates the LangGraph config:
+
+{
+    "configurable": {
+        "thread_id": thread_id
+    }
+}
+
+It calls chat_graph.astream() with a HumanMessage and:
+stream_mode="messages"
+
+STEP 7 — LangGraph
+Current graph:
+
+START
+  |
+  v
+chat_agent
+  |
+  v
+END
+
+chat_agent calls ChatOpenAI.
+
+The thread_id is used with the checkpointer for conversation state.
+
+STEP 8 — Backend yields chunks
+The backend extracts message_chunk.content and yields it.
+
+FastAPI sends the chunks progressively.
+
+STEP 9 — Frontend receives chunks
+api.py uses requests.iter_content() and yields each non-empty chunk.
+
+STEP 10 — Streamlit displays chunks
+chat_processor.py uses:
+
+with st.chat_message("assistant"):
+    response = st.write_stream(...)
+
+The user sees the response progressively.
+
+STEP 11 — Save completed response
+After streaming finishes, the completed response is appended:
+
+{
+    "role": "assistant",
+    "content": response
+}
+
+Then:
+pending_prompt = None
+is_generating = False
+
+The input becomes available again.
+
+10. STREAMING — WHAT CHANGED ON DAY 6
+--------------------------------------
+Before:
+
+User -> request -> wait for full LLM response -> display answer
+
+After:
+
+User -> request
+          |
+          v
+      LLM/LangGraph
+          |
+       chunks
+          |
+          v
+       FastAPI
+          |
+       chunks
+          |
+          v
+      Streamlit
+          |
+          v
+  progressive answer
+
+Streaming makes the UI responsive because the answer is displayed while it is
+being generated/transferred instead of waiting for the entire response.
+
+11. CURRENT STREAMING IMPLEMENTATION
+-------------------------------------
+Frontend:
+- api.py contains stream_chat()
+- HTTP request uses stream=True
+- iter_content() yields chunks
+
+Backend:
+- /chat/stream uses StreamingResponse
+- chat_service.stream_chat() is an async generator
+- LangGraph uses astream(..., stream_mode="messages")
+- message content is yielded progressively
+
+UI:
+- Streamlit uses st.write_stream()
+- Completed response is saved after the stream ends
+
+The normal /chat/ endpoint still exists as a non-streaming baseline/testing path.
+Frontend now uses /chat/stream.
+
+12. STREAMLIT RENDERING ISSUE AND FIX
+-------------------------------------
+During Day 6, the streamed answer initially had a quick stutter/jump and the
+input sometimes became difficult to interact with.
+
+An earlier implementation:
+1. Added an empty assistant message to conversation state.
+2. Created another live assistant container for streaming.
+3. Called st.rerun() after streaming.
+
+This caused duplicate/empty assistant containers and extra rendering.
+
+The stable approach:
+- Do not append an empty assistant placeholder before streaming.
+- Stream directly inside st.chat_message("assistant").
+- Save only the completed assistant response.
+- Avoid an unnecessary final full-page st.rerun().
+- chat.py skips messages whose content is empty.
+
+This made the chat UI stable.
+
+13. DEBUGGING HISTORY
+---------------------
+Problem: AsyncSqliteSaver/import package
+Fix: installed/used langgraph-checkpoint-sqlite and AsyncSqliteSaver.
+
+Problem: "coroutine object is not iterable"
+Cause: stream_chat() did not yield.
+Fix: changed it into an async generator using yield.
+
+Problem: Swagger streaming test was confusing.
+Fix: tested the endpoint with a real streaming HTTP client instead.
+
+Problem: PowerShell curl formatting/escaping.
+Cause: copied command introduced URL/underscore escaping issues.
+Fix: explicitly constructed the request body and verified thread_id.
+
+Problem: frontend ImportError.
+Cause: input.py still imported the old chat() function after api.py moved
+to stream_chat().
+Fix: removed the unused old import.
+
+Problem: empty/duplicate assistant box.
+Cause: old empty assistant message plus live streaming container.
+Fix: no placeholder message + skip empty messages.
+
+Problem: Streamlit stutter/jump.
+Cause: unnecessary rerun and rendering lifecycle.
+Fix: controlled streaming render and no final rerun.
+
+14. CURRENT FRONTEND RESPONSIBILITIES
+-------------------------------------
+app.py:
+- Streamlit configuration
+- session state initialization
+- CSS/background loading
+- sidebar/header/chat/input rendering
+- pending prompt processing
+
+chat.py:
+- welcome screen
+- render saved messages
+- skip empty messages
+
+input.py:
+- receive prompt
+- create conversation when necessary
+- save user message
+- set pending_prompt/is_generating
+- trigger rerun
+
+chat_processor.py:
+- process pending prompt
+- call stream_chat()
+- render live assistant response
+- save completed response
+- reset generation state
+
+api.py:
+- HTTP streaming communication
+
+conversation.py:
+- create new conversation
+- assign UUID thread_id
+
+helpers.py:
+- CSS loading
+- background
+- logo
+
+15. CURRENT BACKEND RESPONSIBILITIES
+------------------------------------
+main.py:
+- FastAPI app
+- routers
+
+models.py:
+- ChatRequest
+- ChatResponse
+
+routers/chat.py:
+- normal /chat/ endpoint
+- streaming /chat/stream endpoint
+
+services/chat_service.py:
+- connects API requests to LangGraph
+- supplies thread_id
+- normal and streaming invocation
+
+graphs/state.py:
+- RyujinState
+
+graphs/chat_graph.py:
+- current basic graph:
+  START -> chat_agent -> END
+
+graphs/checkpointer.py:
+- AsyncSqliteSaver
+- SQLite checkpoint infrastructure
+
+16. WHY chat_graph.py SHOULD NOT BECOME THE SUPERVISOR
+-------------------------------------------------------
+The current chat graph should remain the basic/general chat workflow.
+
+The Supervisor should be a separate top-level graph.
+
+Future:
+
+supervisor_graph.py
+
+START
+  |
+  v
+Supervisor
+  |
+  +--> General Chat Agent
+  +--> Research Agent
+  +--> Coding Agent
+  +--> Writing Agent
+  +--> Study Agent
+  |
+  v
+END
+
+The current chat agent can become one destination of the Supervisor.
+
+17. SUPERVISOR DESIGN
+---------------------
+Supervisor is an LLM-based router/orchestrator.
+
+Supervisor answers:
+"WHO should handle this task?"
+
+LangGraph executes the decision.
+
+Important:
+LLM = decision maker
+LangGraph = workflow controller
+
+A possible future structured decision:
+
+action:
+- new_task
+- continue_task
+- answer_hitl
+
+agent:
+- writing
+- research
+- coding
+- study
+- general
+
+reason:
+- explanation
+
+use_previous_context:
+- whether relevant prior context/artifacts should be used
+
+Exact schema can evolve later.
+
+18. NEW TASK VS CONTINUATION
+----------------------------
+Agents do not own the conversation.
+
+A follow-up should be interpreted using the current conversation/context.
+
+Example:
+User: "Write an email to my manager."
+Writing workflow completes.
+
+Later:
+"Write it again but make it shorter."
+
+This should normally be a new execution using previous context/output.
+
+A completed workflow should not automatically restart just because the user
+references its result.
+
+Example:
+"Let's post the email you provided."
+
+Supervisor should interpret the reference and route the new action appropriately.
+
+19. HITL
+--------
+Human-in-the-loop is separate from ordinary continuation.
+
+If a workflow pauses for approval:
+
+Workflow -> WAIT -> User approval -> Resume same workflow
+
+If the user starts a different task while another workflow is paused, the
+pending workflow remains paused.
+
+20. AGENTS, SUBGRAPHS AND TOOLS
+-------------------------------
+Each specialized agent can eventually have its own subgraph.
+
+Example:
+
+Research Agent
+    |
+    v
+Research Subgraph
+    |
+    +--> retrieve
+    +--> search
+    +--> analyze
+    +--> iterate
+    |
+    v
+answer
+
+Agents may have different tools.
+
+Conceptual tool loop:
+
+Agent LLM
+   |
+Tool needed?
+  / No  Yes
+ |    |
+ |    v
+ |  ToolNode
+ |    |
+ |  Actual tool
+ |    |
+ +----+
+   |
+   v
+Agent LLM
+   |
+   v
+answer
+
+ToolNode executes tools. ToolNode is not itself the external tool.
+
+21. RAG PLAN
+-----------
+RAG is a reusable knowledge/retrieval capability, not automatically a separate
+agent.
+
+Previously discussed pipeline:
+
+PDF
+ |
+ v
+PyPDFLoader
+ |
+ v
+Chunking
+ |
+ v
+Embeddings
+ |
+ v
+ChromaDB
+ |
+ v
+Retrieval
+ |
+ v
+LLM
+
+Previously discussed settings:
+- chunk_size = 1000
+- overlap = 200
+- OpenAI text-embedding-3-small
+- ChromaDB
+- MMR retrieval
+
+Future metadata can include:
+- thread_id
+- file_id
+- file type
+- source
+
+Actual files should be stored separately from vector database data.
+
+22. CHECKPOINTER VS VECTOR DB VS FILE STORAGE
+----------------------------------------------
+Checkpointer:
+workflow/conversation state
+
+Vector database:
+document chunks, embeddings and retrieval metadata
+
+File storage:
+actual uploaded files
+
+These are separate persistence layers.
+
+23. PERSISTENCE ARCHITECTURE DECISION
+-------------------------------------
+Do not automatically give every agent its own SQLite persistence.
+
+Preferred:
+
+Top-level Supervisor/main graph
+        |
+        v
+Main checkpointer
+        |
+        v
+thread_id
+
+Independent persistence can be added later only when a specialized workflow
+actually needs it.
+
+24. CURRENT CONVERSATION-MANAGEMENT LIMITATION
+-----------------------------------------------
+New conversations can be created, but full persistent sidebar chat history and
+resume functionality is not complete.
+
+Future conversation management:
+1. Display existing chats.
+2. Scrollable history.
+3. Click a chat to switch.
+4. Load messages.
+5. New Chat.
+6. Restore chats after Streamlit restart.
+7. Rename.
+8. Delete.
+9. Search.
+
+A future utility can load persisted conversations from backend/checkpoint data.
+A production system may eventually use a dedicated conversation store.
+
+25. FILE/RAG PLAN
+-----------------
+Future file flow:
+
+Upload
+  |
+  +--> actual file storage
+  |
+  +--> metadata
+  |
+  +--> extraction/chunking
+  |
+  +--> embeddings
+  |
+  v
+vector store
+
+Threads can be associated with uploaded files.
+
+26. DEVELOPMENT ORDER
+---------------------
+Recommended order:
+
+1. Streaming Chat — COMPLETE
+2. Proper New Chat / Resume Chat — NEXT
+3. File upload/storage
+4. RAG
+5. Supervisor
+6. General Chat Agent subgraph
+7. Research Agent + subgraph
+8. Coding Agent + subgraph
+9. Writing Agent + subgraph
+10. Study Agent + subgraph
+11. Tools
+12. MCP
+13. Better persistence/global memory
+14. LangSmith observability
+15. Productionization
+
+27. BUILD LOG
+------------
+DAY 0 / FOUNDATION
+- Project architecture and direction.
+- FastAPI foundation.
+- LangGraph foundation.
+- Pydantic models.
+- Modular routers.
+- Swagger/API testing.
+- SQLite checkpointing.
+- Thread concept.
+
+BACKEND FOUNDATION
+- FastAPI backend structure.
+- LangGraph state.
+- Basic chat graph.
+- SQLite persistence/checkpointer.
+
+DAY 5 — UI REFINEMENT
+- Refined Ryujin UI.
+- Dark/glass/purple visual direction.
+- Sidebar/header/chat/input styling.
+- Dragon-themed branding/background.
+- Welcome screen and capability cards.
+- Visual polish.
+
+PROJECT INTERRUPTION
+- Laptop hardware failure.
+- Approximately 1.5 month break.
+- Project work paused.
+- Project files/environment were restored.
+- VS Code and GitHub access were restored.
+- Development resumed.
+
+DAY 6 — STREAMING CHAT
+- Added FastAPI streaming endpoint.
+- Added LangGraph streaming.
+- Added frontend streaming utility.
+- Added Streamlit write_stream.
+- Tested backend streaming independently.
+- Confirmed chunked HTTP streaming.
+- Fixed async generator/coroutine issue.
+- Fixed frontend duplicate/empty assistant box.
+- Stabilized Streamlit rendering/input behavior.
+
+28. CURRENT CHECKPOINT
+----------------------
+WORKING:
+- Basic chat
+- Thread-based persistence
+- SQLite checkpointing
+- FastAPI backend
+- LangGraph chat graph
+- Streaming responses
+- Streamlit streamed display
+- Stable assistant rendering
+- New conversation creation
+- Current Ryujin UI
+
+NOT COMPLETE:
+- Persistent sidebar conversation history
+- Resume old chats after frontend restart
+- Global user memory
+- File upload/storage
+- RAG integration
+- Supervisor
+- Specialized agents
+- Agent subgraphs
+- Tool system
+- MCP
+- HITL workflows
+- LangSmith observability
+- Production PostgreSQL architecture
+- Full productionization
+
+29. NEXT TASK
+-------------
+Next major phase:
+Conversation management.
+
+Goal:
+Make New Chat and Resume Chat work properly.
+
+Expected:
+
+Existing Chat A -> click -> load Chat A
+Existing Chat B -> click -> load Chat B
+New Chat       -> new thread_id
+
+After conversation management:
+File upload/storage -> RAG -> Supervisor -> specialized agents.
+
+30. CORE MENTAL MODEL
+---------------------
+Always separate:
+
+WHO?
+    Supervisor
+
+WHAT?
+    Agent capability
+
+HOW?
+    Agent subgraph/workflow
+
+WITH WHAT?
+    Tools, RAG, files, memory, external systems
+
+And persistence:
+
+WHERE IS THE CONVERSATION?
+    thread_id + checkpointer
+
+WHERE ARE DOCUMENT KNOWLEDGE CHUNKS?
+    vector database
+
+WHERE IS THE ACTUAL FILE?
+    file storage
+
+WHAT SHOULD BE REMEMBERED ACROSS CHATS?
+    future global memory layer
+
+31. BUILDING PRINCIPLE
+----------------------
+Ryujin should be built incrementally:
+
+Understand
+   ->
+Implement small piece
+   ->
+Run
+   ->
+Observe
+   ->
+Debug
+   ->
+Understand why
+   ->
+Move to next layer
+
+Do not prematurely implement the complete multi-agent system.
+
+The current streaming chat is the stable foundation for the future Supervisor
+and multi-agent architecture.
+
+END OF DOCUMENT

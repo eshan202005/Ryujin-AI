@@ -11,6 +11,7 @@ from components.header import render_header
 from components.chat import render_chat
 from components.input import render_input
 from utils.chat_processor import process_pending_prompt
+from utils.persistence import load_persisted_conversations
 
 
 # ==========================================================
@@ -36,7 +37,8 @@ set_background()
 # ==========================================================
 
 if "conversations" not in st.session_state:
-    st.session_state.conversations = {}
+    st.session_state.conversations = load_persisted_conversations()
+   
 
 if "current_thread" not in st.session_state:
     st.session_state.current_thread = None
@@ -52,7 +54,8 @@ if "pending_prompt" not in st.session_state:
 with st.sidebar:
     render_sidebar()
 
-render_header()
-render_chat()
-process_pending_prompt()
-render_input()
+render_header() #renders the header whenever reuns 
+render_chat() #renders the chat interface, including the welcome screen and old messages
+process_pending_prompt() #processes the pending prompt and displays the response from backend in chunks as it is being generated and then stores the response inside the messages list of the conversation dict
+render_input() # takes the input as its the last thing and then reruns the app so that chat_genrator can work
+# and display the response from backend in chunks as it is being generated and then stores the response inside the messages list of the conversation dict

@@ -3,7 +3,7 @@ import requests
 BASE_URL = "http://127.0.0.1:8000"
 
 
-def stream_chat(message: str, thread_id: str):
+def stream_chat(message: str, thread_id: str): #used to send send the msg and thread_id to backend and get reponse in chunks and get displayed
     response = requests.post(
         f"{BASE_URL}/chat/stream",
         json={

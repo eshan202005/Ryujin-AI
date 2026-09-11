@@ -56,7 +56,7 @@ for every request.
 # CHAT MESSAGES
 # ==========================================================
 
-def render_messages(messages):
+def render_messages(messages): #used to render the messages in the chat window
 
     for message in messages:
 
@@ -77,7 +77,7 @@ def render_messages(messages):
 # MAIN CHAT
 # ==========================================================
 
-def render_chat():
+def render_chat(): #Renders the chat interface, including the welcome screen and messages
 
     current_thread = st.session_state.current_thread
 

@@ -46,7 +46,7 @@ Building Intelligence
     # NEW CHAT
     # ======================================================
 
-    if st.button(
+    if st.button( #when new chat button pressed current thread = none and rerun the app
         "➕  New Chat",
         use_container_width=True,
         type="primary",
@@ -68,7 +68,7 @@ Building Intelligence
     if not st.session_state.conversations:
 
         st.markdown(
-            """
+        """
 <div class="empty-card">
 
 <b>No conversations yet.</b>
@@ -79,35 +79,19 @@ Start a new chat to begin.
 
 </div>
 """,
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("<hr>", unsafe_allow_html=True)
-
-    # ======================================================
-    # WORKSPACE
-    # ======================================================
-
-    st.markdown(
-        '<div class="sidebar-section">WORKSPACE</div>',
         unsafe_allow_html=True,
     )
 
-    st.button(
-        "📄 Upload Resume",
-        use_container_width=True,
-        key="upload_resume",
-    )
+    else:
 
-    st.markdown("<hr>", unsafe_allow_html=True)
+        for thread_id, conversation in reversed(st.session_state.conversations.items()): #this displays all the previous chats 
 
-    # ======================================================
-    # SETTINGS
-    # ======================================================
+            if st.button( #when a old chat is pressed it sets current thread to that the thread id of that old chat and reruns the app to display that chat
+            conversation["name"],
+            key=f"conversation_{thread_id}",
+            use_container_width=True,
+            ):
 
-    st.markdown(
-        '<div class="sidebar-section">SETTINGS</div>',
-        unsafe_allow_html=True,
-    )
+                st.session_state.current_thread = thread_id
 
-    st.caption("Coming Soon")
+                st.rerun()

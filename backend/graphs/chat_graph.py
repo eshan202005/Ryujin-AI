@@ -15,6 +15,7 @@ def chat_agent(state: RyujinState) -> RyujinState:
 builder = StateGraph(RyujinState)
 
 builder.add_node("chat_agent",chat_agent)
+
 builder.add_edge(START,"chat_agent")
 builder.add_edge("chat_agent",END)
 
