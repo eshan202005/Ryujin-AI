@@ -1,6 +1,6 @@
 from langchain_core.messages import HumanMessage
 
-from backend.graphs.chat_graph import chat_graph
+from backend.graphs.general_graph import general_graph
 
 
 async def chat(message: str, thread_id: str) -> str:
@@ -11,7 +11,7 @@ async def chat(message: str, thread_id: str) -> str:
         }
     }
 
-    result = await chat_graph.ainvoke(
+    result = await general_graph.ainvoke(
         {
             "messages": [
                 HumanMessage(content=message)
@@ -30,7 +30,7 @@ async def stream_chat(message: str, thread_id: str):
         }
     }
 
-    async for message_chunk, metadata in chat_graph.astream(
+    async for message_chunk, metadata in general_graph.astream(
         {
             "messages": [
                 HumanMessage(content=message)
