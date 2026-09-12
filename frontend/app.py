@@ -57,5 +57,5 @@ with st.sidebar:
 render_header() #renders the header whenever reuns 
 render_chat() #renders the chat interface, including the welcome screen and old messages
 process_pending_prompt() #processes the pending prompt and displays the response from backend in chunks as it is being generated and then stores the response inside the messages list of the conversation dict
-render_input() # takes the input as its the last thing and then reruns the app so that chat_genrator can work
+render_input() # takes the input as its the last thing and it makes genrating =true  then reruns the app so that chat_genrator can work
 # and display the response from backend in chunks as it is being generated and then stores the response inside the messages list of the conversation dict

@@ -1,178 +1,250 @@
 /* ==========================================================
-SIDEBAR
-========================================================== */
+   SIDEBAR
+   ========================================================== */
 
-section[data-testid="stSidebar"]{
+section[data-testid="stSidebar"] {
 
-    background:rgba(10,10,18,.35)!important;
+    background: rgba(10, 10, 18, .35) !important;
 
-    backdrop-filter:blur(30px);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
 
-    -webkit-backdrop-filter:blur(30px);
-
-    border-right:1px solid rgba(255,255,255,.05);
+    border-right: 1px solid rgba(255, 255, 255, .05);
 
     box-shadow:
-        10px 0 40px rgba(0,0,0,.35);
+        10px 0 40px rgba(0, 0, 0, .35);
 
-    min-width:285px!important;
-
-    max-width:285px!important;
-
+    min-width: 285px !important;
+    max-width: 285px !important;
 }
+
 
 /* ==========================================================
-CONTENT
-========================================================== */
+   CONTENT
+   ========================================================== */
 
-section[data-testid="stSidebar"] > div{
+section[data-testid="stSidebar"] > div {
 
-    padding:20px 18px 16px 18px;
+    padding: 10px 18px 16px 18px;
 
 }
+
 
 /* ==========================================================
-LOGO
-========================================================== */
+   LOGO
+   ========================================================== */
 
-.logo-title{
+.logo-title {
 
-    color:white;
+    color: white;
 
-    font-size:29px;
+    font-size: 28px;
 
-    font-weight:700;
+    font-weight: 700;
 
-    line-height:1.05;
+    line-height: 1.05;
 
-    letter-spacing:.2px;
-
-}
-
-.logo-ai{
-
-    color:var(--primary-light);
+    letter-spacing: .2px;
 
 }
 
-.logo-subtitle{
 
-    color:#A8B0C2;
+.logo-ai {
 
-    font-size:13px;
-
-    margin-top:4px;
+    color: var(--primary-light);
 
 }
+
+
+.logo-subtitle {
+
+    color: #A8B0C2;
+
+    font-size: 12px;
+
+    margin-top: 3px;
+
+}
+
 
 /* ==========================================================
-PRIMARY BUTTON
-========================================================== */
+   SIDEBAR BUTTON BASE
+   ========================================================== */
 
-section[data-testid="stSidebar"] .stButton>button{
+section[data-testid="stSidebar"] .stButton > button {
 
-    width:100%;
+    width: 100%;
 
-    height:52px;
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
 
-    border:none;
+}
 
-    border-radius:16px;
+
+/* ==========================================================
+   NEW CHAT
+   ========================================================== */
+
+section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+
+    height: 40px !important;
+
+    min-height: 40px !important;
+
+    border-radius: 10px !important;
+
+    border: 1px solid rgba(168, 85, 247, .30) !important;
 
     background:
-    linear-gradient(
-        135deg,
-        var(--primary),
-        var(--primary-light)
-    );
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-light)
+        ) !important;
 
-    color:white;
+    color: white !important;
 
-    font-size:15px;
+    font-size: 13px !important;
 
-    font-weight:600;
-
-    transition:.25s;
+    font-weight: 600 !important;
 
 }
 
-section[data-testid="stSidebar"] .stButton>button:hover{
 
-    transform:
-        translateY(-2px)
-        scale(1.01);
+section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+
+    transform: translateY(-1px);
+
+    border-color:
+        rgba(255, 255, 255, .18) !important;
 
     box-shadow:
-        0 0 28px rgba(168,85,247,.35);
+        0 0 22px rgba(168, 85, 247, .30) !important;
 
 }
 
+
 /* ==========================================================
-SECOND BUTTON
-========================================================== */
+   INACTIVE CONVERSATIONS
+   ========================================================== */
 
-section[data-testid="stSidebar"] button[kind="secondary"]{
+section[data-testid="stSidebar"] .stButton > button[kind="secondary"] {
 
-    background:rgba(255,255,255,.05)!important;
+    height: 40px !important;
 
-    border:1px solid rgba(255,255,255,.08)!important;
+    min-height: 40px !important;
+
+    border-radius: 9px !important;
+
+    margin-bottom: 0 !important;
+
+    background:
+        rgba(255, 255, 255, .035) !important;
+
+    border:
+        1px solid rgba(255, 255, 255, .065) !important;
+
+    color: #C7CBD6 !important;
+
+    font-size: 13px !important;
+
+    font-weight: 500 !important;
+
+    line-height: 1.1 !important;
 
 }
 
-/* ==========================================================
-SECTION
-========================================================== */
 
-.sidebar-section{
+section[data-testid="stSidebar"]
+.stButton > button[kind="secondary"]:hover {
 
-    color:#8F95A3;
+    background:
+        rgba(168, 85, 247, .08) !important;
 
-    font-size:11px;
+    border-color:
+        rgba(168, 85, 247, .20) !important;
 
-    font-weight:700;
-
-    letter-spacing:1.5px;
-
-    margin-top:18px;
-
-    margin-bottom:10px;
-
-    text-transform:uppercase;
+    transform: translateY(-1px);
 
 }
 
+
 /* ==========================================================
-EMPTY CARD
-========================================================== */
+   ACTIVE CONVERSATION
+   ========================================================== */
 
-.empty-card{
+section[data-testid="stSidebar"]
+.stButton > button[kind="primary"] {
 
-    padding:14px;
-
-    border-radius:16px;
-
-    background:rgba(255,255,255,.04);
-
-    border:1px solid rgba(255,255,255,.06);
-
-    color:#B8C0CF;
-
-    line-height:1.6;
-
-    font-size:14px;
+    box-shadow:
+        0 0 16px rgba(168, 85, 247, .20),
+        inset 0 0 10px rgba(168, 85, 247, .05) !important;
 
 }
 
+
 /* ==========================================================
-DIVIDER
-========================================================== */
+   SECTION TITLE
+   ========================================================== */
 
-hr{
+.sidebar-section {
 
-    border:none;
+    color: #8F95A3;
 
-    border-top:1px solid rgba(255,255,255,.05);
+    font-size: 10px;
 
-    margin:14px 0;
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+
+    margin-top: 11px;
+
+    margin-bottom: 7px;
+
+    text-transform: uppercase;
+
+}
+
+
+/* ==========================================================
+   EMPTY CARD
+   ========================================================== */
+
+.empty-card {
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255, 255, 255, .035);
+
+    border:
+        1px solid rgba(255, 255, 255, .06);
+
+    color: #B8C0CF;
+
+    line-height: 1.5;
+
+    font-size: 13px;
+
+}
+
+
+/* ==========================================================
+   DIVIDER
+   ========================================================== */
+
+hr {
+
+    border: none;
+
+    border-top:
+        1px solid rgba(255, 255, 255, .055);
+
+    margin: 7px 0;
 
 }

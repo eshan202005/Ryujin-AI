@@ -1,11 +1,9 @@
 import streamlit as st
-from utils.conversation import create_conversation
+
 from utils.helpers import show_logo
 
 
-
 def render_sidebar():
-    
 
     # ======================================================
     # LOGO
@@ -18,6 +16,7 @@ def render_sidebar():
     )
 
     with logo:
+
         show_logo(width=90)
 
     with text:
@@ -42,19 +41,24 @@ Building Intelligence
 
     st.write("")
 
+
     # ======================================================
     # NEW CHAT
     # ======================================================
 
-    if st.button( #when new chat button pressed current thread = none and rerun the app
+    if st.button(
         "➕  New Chat",
         use_container_width=True,
         type="primary",
     ):
+
         st.session_state.current_thread = None
+
         st.rerun()
 
+
     st.markdown("<hr>", unsafe_allow_html=True)
+
 
     # ======================================================
     # CONVERSATIONS
@@ -65,10 +69,11 @@ Building Intelligence
         unsafe_allow_html=True,
     )
 
+
     if not st.session_state.conversations:
 
         st.markdown(
-        """
+            """
 <div class="empty-card">
 
 <b>No conversations yet.</b>
@@ -79,19 +84,51 @@ Start a new chat to begin.
 
 </div>
 """,
-        unsafe_allow_html=True,
-    )
+            unsafe_allow_html=True,
+        )
 
-    else:
+        return
 
-        for thread_id, conversation in reversed(st.session_state.conversations.items()): #this displays all the previous chats 
 
-            if st.button( #when a old chat is pressed it sets current thread to that the thread id of that old chat and reruns the app to display that chat
+    # ======================================================
+    # NEWEST → OLDEST
+    #
+    # persistence.py stores them oldest → newest.
+    # Reversing gives newest → oldest.
+    #
+    # This also works for newly-created conversations
+    # because conversation.py adds them to the dictionary
+    # in creation order.
+    # ======================================================
+
+    for thread_id, conversation in reversed(
+        list(st.session_state.conversations.items())
+    ):
+
+        is_active = (
+            thread_id == st.session_state.current_thread
+        )
+
+
+        # Active conversation gets primary styling
+        button_type = (
+            "primary"
+            if is_active
+            else "secondary"
+        )
+
+
+        # ==================================================
+        # CONVERSATION BUTTON
+        # ==================================================
+
+        if st.button(
             conversation["name"],
             key=f"conversation_{thread_id}",
             use_container_width=True,
-            ):
+            type=button_type,
+        ):
 
-                st.session_state.current_thread = thread_id
+            st.session_state.current_thread = thread_id
 
-                st.rerun()
+            st.rerun()

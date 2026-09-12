@@ -6,9 +6,12 @@ from backend.graphs.checkpointer import (
 
 async def _load_persisted_conversations():
 
-    latest_checkpoints = {}
+    threads = {}
 
-    # Get all saved checkpoints
+    # ======================================================
+    # READ ALL CHECKPOINTS
+    # ======================================================
+
     async for checkpoint in checkpointer.alist(None):
 
         config = checkpoint.config
@@ -18,28 +21,61 @@ async def _load_persisted_conversations():
         if not thread_id:
             continue
 
-        # Keep only the latest checkpoint for each thread
-        existing = latest_checkpoints.get(thread_id)
+        checkpoint_data = checkpoint.checkpoint
 
-        if existing is None or checkpoint.checkpoint["ts"] > existing.checkpoint["ts"]:
-            latest_checkpoints[thread_id] = checkpoint
+        timestamp = checkpoint_data.get("ts")
+
+        if not timestamp:
+            continue
+
+        # First checkpoint = conversation creation time
+        # Latest checkpoint = conversation's latest state
+
+        if thread_id not in threads:
+
+            threads[thread_id] = {
+                "created_at": timestamp,
+                "latest_at": timestamp,
+                "latest_checkpoint": checkpoint,
+            }
+
+        else:
+
+            # Keep earliest timestamp for ordering
+            if timestamp < threads[thread_id]["created_at"]:
+
+                threads[thread_id]["created_at"] = timestamp
+
+            # Keep latest checkpoint for complete history
+            if timestamp > threads[thread_id]["latest_at"]:
+
+                threads[thread_id]["latest_at"] = timestamp
+
+                threads[thread_id]["latest_checkpoint"] = checkpoint
+
 
     conversations = {}
 
-    # Convert LangGraph data into frontend format
-    for thread_id, checkpoint in latest_checkpoints.items():
 
-        checkpoint_data = checkpoint.checkpoint
+    # ======================================================
+    # BUILD CONVERSATIONS
+    # ======================================================
 
-        messages = checkpoint_data.get(
-            "channel_values",
-            {},
-        ).get(
-            "messages",
-            [],
+    for thread_id, data in threads.items():
+
+        checkpoint_data = data["latest_checkpoint"].checkpoint
+
+        messages = (
+            checkpoint_data
+            .get("channel_values", {})
+            .get("messages", [])
         )
 
-        # Find first user message
+
+        # ==================================================
+        # AUTOMATIC CHAT NAME
+        # ==================================================
+
         name = "New Chat"
 
         for message in messages:
@@ -48,15 +84,23 @@ async def _load_persisted_conversations():
 
                 name = message.content.strip()
 
-                # Keep sidebar names reasonably short
                 if len(name) > 40:
+
                     name = name[:40] + "..."
 
                 break
 
+
+        # ==================================================
+        # FRONTEND CONVERSATION
+        # ==================================================
+
         conversations[thread_id] = {
+
             "thread_id": thread_id,
+
             "name": name,
+
             "messages": [
                 {
                     "role": (
@@ -68,8 +112,25 @@ async def _load_persisted_conversations():
                 }
                 for message in messages
             ],
+
             "files": [],
         }
+
+
+    # ======================================================
+    # SORT OLDEST → NEWEST
+    #
+    # sidebar.py reverses this when displaying,
+    # giving us NEWEST → OLDEST.
+    # ======================================================
+
+    conversations = dict(
+        sorted(
+            conversations.items(),
+            key=lambda item: threads[item[0]]["created_at"],
+        )
+    )
+
 
     return conversations
 
