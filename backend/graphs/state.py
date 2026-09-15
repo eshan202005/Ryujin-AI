@@ -1,4 +1,4 @@
-from typing import TypedDict, Annotated
+from typing import TypedDict, Annotated ,Literal
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 
@@ -20,3 +20,9 @@ class RyujinState(TypedDict):
 
     # Final Coding Agent output
     coding_solution: str
+    review_decision: Literal["approved", "not_approved"]
+    review_issues: list[str]
+    review_iterations: int
+    final_response: str
+
+    

@@ -3,7 +3,7 @@ from typing import Literal
 from langgraph.prebuilt import ToolNode
 from pydantic import BaseModel
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage , HumanMessage
 from backend.agents.coding.tools import python_execution, run_tests, search_tool
 
 from langgraph.graph import StateGraph, START, END
@@ -54,6 +54,13 @@ tool_node = ToolNode(
     tools,
     messages_key="coding_history"
 )
+
+def initialize_coding_state(state: RyujinState) -> RyujinState:
+
+    return {
+        "review_iterations": 0,
+        "coding_history": [],
+    }
 
 
 def coding_planner(state: RyujinState) -> RyujinState:
@@ -368,6 +375,7 @@ def review_router(
 
 builder = StateGraph(RyujinState)
 
+builder.add_node("initialize_coding_state",initialize_coding_state)
 builder.add_node("coding_planner", coding_planner)
 builder.add_node("coding_worker", coding_worker)
 builder.add_node("tool_node", tool_node)
@@ -375,7 +383,8 @@ builder.add_node("coding_reviewer", coding_reviewer)  # Placeholder for the revi
 builder.add_node("coding_optimizer", coding_optimizer)
 builder.add_node("coding_finalizer", coding_finalizer)
 
-builder.add_edge(START, "coding_planner")
+builder.add_edge(START, "initialize_coding_state")
+builder.add_edge("initialize_coding_state", "coding_planner")
 builder.add_edge("coding_planner", "coding_worker")
 builder.add_conditional_edges(
     "coding_worker",
@@ -399,5 +408,4 @@ builder.add_edge("coding_optimizer", "coding_reviewer")
 builder.add_edge("coding_finalizer", END)
 
 coding_graph = builder.compile()
-
 
