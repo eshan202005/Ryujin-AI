@@ -7,6 +7,8 @@ class RyujinState(TypedDict):
     # Main conversation
     messages: Annotated[list[BaseMessage], add_messages]
 
+    next : Literal["general", "coding"]
+
     # Coding Agent internal Worker ↔ ToolNode history
     coding_history: Annotated[list[BaseMessage], add_messages]
 
@@ -24,5 +26,7 @@ class RyujinState(TypedDict):
     review_issues: list[str]
     review_iterations: int
     final_response: str
+
+    
 
     

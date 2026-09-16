@@ -1,7 +1,6 @@
 from langgraph.graph import StateGraph , START,END
 from langchain_openai import ChatOpenAI
 from backend.graphs.state import RyujinState
-from backend.graphs.checkpointer import checkpointer
 from dotenv import load_dotenv
 from langgraph.prebuilt import ToolNode , tools_condition
 from backend.agents.general.tools import calculator_tool, search_tool
@@ -37,5 +36,5 @@ builder.add_conditional_edges(
 )
 builder.add_edge("tool_node","chat_agent")
 
-general_graph = builder.compile(checkpointer = checkpointer)
+general_graph = builder.compile()
 

@@ -1,6 +1,6 @@
 from langchain_core.messages import HumanMessage
 
-from backend.graphs.general_graph import general_graph
+from backend.graphs.main_graph import main_graph
 
 
 async def chat(message: str, thread_id: str) -> str:
@@ -11,7 +11,7 @@ async def chat(message: str, thread_id: str) -> str:
         }
     }
 
-    result = await general_graph.ainvoke(
+    result = await main_graph.ainvoke(
         {
             "messages": [
                 HumanMessage(content=message)
@@ -20,17 +20,21 @@ async def chat(message: str, thread_id: str) -> str:
         config=config,
     )
 
+    if result.get("final_response"):
+        return result["final_response"]
+
     return result["messages"][-1].content
 
 
 async def stream_chat(message: str, thread_id: str):
+
     config = {
         "configurable": {
             "thread_id": thread_id
         }
     }
 
-    async for message_chunk, metadata in general_graph.astream(
+    async for namespace, chunk in main_graph.astream(
         {
             "messages": [
                 HumanMessage(content=message)
@@ -38,6 +42,15 @@ async def stream_chat(message: str, thread_id: str):
         },
         config=config,
         stream_mode="messages",
+        subgraphs=True,
     ):
+
+        message_chunk, metadata = chunk
+
+        node = metadata.get("langgraph_node")
+
+        if node not in ["chat_agent", "coding_finalizer"]:
+            continue
+
         if message_chunk.content:
             yield message_chunk.content
