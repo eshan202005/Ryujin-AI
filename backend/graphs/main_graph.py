@@ -26,28 +26,6 @@ class SupervisorDecision(BaseModel):
 supervisor_llm = llm.with_structured_output(SupervisorDecision)
 
 
-from typing import Literal
-
-from pydantic import BaseModel
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import SystemMessage
-
-from backend.graphs.state import RyujinState
-from dotenv import load_dotenv
-
-load_dotenv()
-
-
-llm = ChatOpenAI(model="gpt-5-mini")
-
-
-class SupervisorDecision(BaseModel):
-    next: Literal["general", "coding"]
-
-
-supervisor_llm = llm.with_structured_output(SupervisorDecision)
-
-
 def supervisor(state: RyujinState) -> RyujinState:
 
     messages = [
@@ -64,6 +42,9 @@ GENERAL:
 - General questions and reasoning
 - Basic calculations
 - Web search for general information
+- Wikipedia-based factual information
+- Unit conversion
+- Current date and time
 
 CODING:
 - Generate code

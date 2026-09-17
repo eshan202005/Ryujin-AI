@@ -3,14 +3,14 @@ from langchain_openai import ChatOpenAI
 from backend.graphs.state import RyujinState
 from dotenv import load_dotenv
 from langgraph.prebuilt import ToolNode , tools_condition
-from backend.agents.general.tools import calculator_tool, search_tool
+from backend.agents.general.tools import calculator_tool, search_tool , wikipedia_tool , unit_conversion , current_datetime 
 
 load_dotenv()
 
 
 
 llm = ChatOpenAI(model="gpt-5-mini")
-tools = [calculator_tool, search_tool]
+tools = [calculator_tool, search_tool, wikipedia_tool , unit_conversion , current_datetime]
 llm_with_tools = llm.bind_tools(tools)
 
 def chat_agent(state: RyujinState) -> RyujinState:

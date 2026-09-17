@@ -20,9 +20,6 @@ async def chat(message: str, thread_id: str) -> str:
         config=config,
     )
 
-    if result.get("final_response"):
-        return result["final_response"]
-
     return result["messages"][-1].content
 
 
@@ -34,23 +31,48 @@ async def stream_chat(message: str, thread_id: str):
         }
     }
 
-    async for namespace, chunk in main_graph.astream(
+    async for chunk in main_graph.astream(
         {
             "messages": [
                 HumanMessage(content=message)
             ]
         },
         config=config,
-        stream_mode="messages",
+        stream_mode=["messages", "custom"],
         subgraphs=True,
+        version="v2",
     ):
 
-        message_chunk, metadata = chunk
+        # -----------------------------
+        # LLM message stream
+        # -----------------------------
+        if chunk["type"] == "messages":
 
-        node = metadata.get("langgraph_node")
+            message_chunk, metadata = chunk["data"]
 
-        if node not in ["chat_agent", "coding_finalizer"]:
-            continue
+            node = metadata.get("langgraph_node")
 
-        if message_chunk.content:
-            yield message_chunk.content
+            # Only General Agent
+            if node != "chat_agent":
+                continue
+
+            if message_chunk.content:
+                yield message_chunk.content
+
+        # -----------------------------
+        # Custom stream
+        # -----------------------------
+        elif chunk["type"] == "custom":
+
+            data = chunk["data"]
+
+            if not isinstance(data, dict):
+                continue
+
+            if data.get("type") != "coding_final_response":
+                continue
+
+            content = data.get("content")
+
+            if content:
+                yield content

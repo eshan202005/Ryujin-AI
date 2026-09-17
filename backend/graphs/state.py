@@ -25,8 +25,7 @@ class RyujinState(TypedDict):
     review_decision: Literal["approved", "not_approved"]
     review_issues: list[str]
     review_iterations: int
-    final_response: str
-
+  
     
 
     
