@@ -50,7 +50,6 @@ async def _load_persisted_conversations():
             if timestamp > threads[thread_id]["latest_at"]:
 
                 threads[thread_id]["latest_at"] = timestamp
-
                 threads[thread_id]["latest_checkpoint"] = checkpoint
 
 
@@ -69,6 +68,13 @@ async def _load_persisted_conversations():
             checkpoint_data
             .get("channel_values", {})
             .get("messages", [])
+        )
+
+        # Get files belonging to this thread
+        files = (
+            checkpoint_data
+            .get("channel_values", {})
+            .get("files", [])
         )
 
 
@@ -113,15 +119,15 @@ async def _load_persisted_conversations():
                 for message in messages
             ],
 
-            "files": [],
+            # Restore files from LangGraph state
+            "files": files,
         }
 
 
     # ======================================================
     # SORT OLDEST → NEWEST
     #
-    # sidebar.py reverses this when displaying,
-    # giving us NEWEST → OLDEST.
+    # sidebar.py keeps this order when displaying.
     # ======================================================
 
     conversations = dict(

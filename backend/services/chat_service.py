@@ -52,12 +52,11 @@ async def stream_chat(message: str, thread_id: str):
 
             node = metadata.get("langgraph_node")
 
-            # Only General Agent
-            if node != "chat_agent":
-                continue
+            # Only stream General Agent's direct LLM response
+            if node == "chat_agent":
 
-            if message_chunk.content:
-                yield message_chunk.content
+                if message_chunk.content:
+                    yield message_chunk.content
 
         # -----------------------------
         # Custom stream
@@ -69,7 +68,13 @@ async def stream_chat(message: str, thread_id: str):
             if not isinstance(data, dict):
                 continue
 
-            if data.get("type") != "coding_final_response":
+            event_type = data.get("type")
+
+            # Coding + Research finalizer streams
+            if event_type not in {
+                "coding_final_response",
+                "research_final_response",
+            }:
                 continue
 
             content = data.get("content")

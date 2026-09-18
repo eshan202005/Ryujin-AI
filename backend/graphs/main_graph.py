@@ -10,6 +10,7 @@ from backend.graphs.checkpointer import checkpointer
 
 from backend.graphs.general_graph import general_graph
 from backend.graphs.coding_graph import coding_graph
+from backend.graphs.research_graph import research_graph
 
 from dotenv import load_dotenv
 
@@ -20,7 +21,7 @@ llm = ChatOpenAI(model="gpt-5-mini")
 
 
 class SupervisorDecision(BaseModel):
-    next: Literal["general", "coding"]
+    next: Literal["general", "coding", "research"]
 
 
 supervisor_llm = llm.with_structured_output(SupervisorDecision)
@@ -53,6 +54,12 @@ CODING:
 - Execute or test code
 - Review and improve coding solutions
 
+RESEARCH:
+- Research questions requiring multiple sources
+- Search the user's uploaded documents
+- Current or external information requiring web search
+- Factual/background research using Wikipedia
+
 Routing rules:
 
 Choose "coding" when the user's request involves writing,
@@ -61,6 +68,10 @@ debugging, explaining, testing, or working with code.
 Choose "general" for general questions, reasoning,
 calculations, or other requests that do not primarily
 require the Coding Agent.
+
+Choose "research" when the user's request requires
+research, document retrieval, web research, or gathering
+information from multiple sources.
 
 Return only the routing decision.
 Do not answer the user's question.
@@ -75,7 +86,7 @@ Do not answer the user's question.
         "next": decision.next,
     }
 
-def supervisor_router(state: RyujinState) -> Literal["general", "coding"]:
+def supervisor_router(state: RyujinState) -> Literal["general", "coding", "research"]:
 
     return state["next"]
 
@@ -84,6 +95,7 @@ builder = StateGraph(RyujinState)
 builder.add_node("supervisor", supervisor)
 builder.add_node("general", general_graph)
 builder.add_node("coding", coding_graph)
+builder.add_node("research", research_graph)
 
 builder.add_edge(START, "supervisor")
 builder.add_conditional_edges(
@@ -91,11 +103,13 @@ builder.add_conditional_edges(
     supervisor_router,
     {
         "general": "general",
-        "coding": "coding"
+        "coding": "coding",
+        "research": "research"
     }
 )
 builder.add_edge("general", END)
 builder.add_edge("coding", END)
+builder.add_edge("research", END)
 
 
 main_graph = builder.compile(checkpointer=checkpointer)

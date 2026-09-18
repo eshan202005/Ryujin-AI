@@ -7,7 +7,9 @@ class RyujinState(TypedDict):
     # Main conversation
     messages: Annotated[list[BaseMessage], add_messages]
 
-    next : Literal["general", "coding"]
+    files: list[dict]
+
+    next : Literal["general", "coding", "research"]
 
     # Coding Agent internal Worker ↔ ToolNode history
     coding_history: Annotated[list[BaseMessage], add_messages]
@@ -26,6 +28,18 @@ class RyujinState(TypedDict):
     review_issues: list[str]
     review_iterations: int
   
-    
+    research_history: Annotated[list[BaseMessage], add_messages]
+
+    research_plan: list[str]
+
+    requires_rag: bool
+    requires_web_search: bool
+    requires_wikipedia: bool
+
+    research_findings: str
+
+    research_decision: Literal["approved", "not_approved"]
+    research_issues: list[str]
+    research_iterations: int
 
     
