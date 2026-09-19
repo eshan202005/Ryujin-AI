@@ -41,12 +41,12 @@ async def _load_persisted_conversations():
 
         else:
 
-            # Keep earliest timestamp for ordering
+            # Keep earliest timestamp
             if timestamp < threads[thread_id]["created_at"]:
 
                 threads[thread_id]["created_at"] = timestamp
 
-            # Keep latest checkpoint for complete history
+            # Keep latest checkpoint
             if timestamp > threads[thread_id]["latest_at"]:
 
                 threads[thread_id]["latest_at"] = timestamp
@@ -64,17 +64,19 @@ async def _load_persisted_conversations():
 
         checkpoint_data = data["latest_checkpoint"].checkpoint
 
-        messages = (
-            checkpoint_data
-            .get("channel_values", {})
-            .get("messages", [])
+        channel_values = checkpoint_data.get(
+            "channel_values",
+            {}
         )
 
-        # Get files belonging to this thread
-        files = (
-            checkpoint_data
-            .get("channel_values", {})
-            .get("files", [])
+        messages = channel_values.get(
+            "messages",
+            []
+        )
+
+        files = channel_values.get(
+            "files",
+            []
         )
 
 
@@ -125,15 +127,20 @@ async def _load_persisted_conversations():
 
 
     # ======================================================
-    # SORT OLDEST → NEWEST
+    # SORT MOST RECENTLY ACTIVE → OLDEST
     #
-    # sidebar.py keeps this order when displaying.
+    # latest_at = timestamp of the latest checkpoint
+    #
+    # Therefore:
+    # recently used chats → TOP
+    # older chats          → BOTTOM
     # ======================================================
 
     conversations = dict(
         sorted(
             conversations.items(),
-            key=lambda item: threads[item[0]]["created_at"],
+            key=lambda item: threads[item[0]]["latest_at"],
+            reverse=True,
         )
     )
 

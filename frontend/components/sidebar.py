@@ -155,7 +155,7 @@ def render_sidebar():
 
             for file in files:
 
-                st.markdown(
+                st.html(
                     f"""
                     <div class="file-card">
 
@@ -168,8 +168,7 @@ def render_sidebar():
                         </span>
 
                     </div>
-                    """,
-                    unsafe_allow_html=True,
+                    """
                 )
 
 
