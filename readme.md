@@ -63,5 +63,3 @@ Ryujin AI aims to become an intelligent AI platform capable :
 - 🤖 Autonomous Multi-Agent Workflows
 
 ---
-
-⭐ **Ryujin AI is actively being built in public.**
