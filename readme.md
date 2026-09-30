@@ -4,7 +4,7 @@ An intelligent multi-agent AI platform built with **FastAPI**, **Streamlit**, an
 
 Ryujin is designed to provide a seamless AI experience where users simply describe their task, and the system automatically selects the appropriate agents and tools behind the scenes.
 
-> **Ask naturally. Ryujin handles the rest.**
+
 
 ---
 
