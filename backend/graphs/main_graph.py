@@ -11,6 +11,7 @@ from backend.graphs.checkpointer import checkpointer
 from backend.graphs.general_graph import general_graph
 from backend.graphs.coding_graph import coding_graph
 from backend.graphs.research_graph import research_graph
+from backend.graphs.writing_graph import writing_graph
 
 from dotenv import load_dotenv
 
@@ -21,7 +22,7 @@ llm = ChatOpenAI(model="gpt-5-mini")
 
 
 class SupervisorDecision(BaseModel):
-    next: Literal["general", "coding", "research"]
+    next: Literal["general", "coding", "research", "writing"]
 
 
 supervisor_llm = llm.with_structured_output(SupervisorDecision)
@@ -60,10 +61,18 @@ RESEARCH:
 - Current or external information requiring web search
 - Factual/background research using Wikipedia
 
+WRITING:
+- Create new prose such as emails, posts, articles, stories, and job descriptions
+- Revise or rewrite supplied text
+- Proofread grammar, spelling, punctuation, and clarity
+
 Routing rules:
 
-Choose "coding" when the user's request involves writing,
-debugging, explaining, testing, or working with code.
+Choose "coding" when the user's request involves programming code,
+including generating, debugging, explaining, or testing code.
+
+Choose "writing" when the main request is to create, revise,
+rewrite, or proofread prose. Writing code belongs to "coding".
 
 Choose "general" for general questions, reasoning,
 calculations, or other requests that do not primarily
@@ -72,6 +81,9 @@ require the Coding Agent.
 Choose "research" when the user's request requires
 research, document retrieval, web research, or gathering
 information from multiple sources.
+
+When a request primarily needs research before content creation,
+choose "research". Otherwise, choose "writing" for the writing task.
 
 Return only the routing decision.
 Do not answer the user's question.
@@ -86,7 +98,9 @@ Do not answer the user's question.
         "next": decision.next,
     }
 
-def supervisor_router(state: RyujinState) -> Literal["general", "coding", "research"]:
+def supervisor_router(
+    state: RyujinState,
+) -> Literal["general", "coding", "research", "writing"]:
 
     return state["next"]
 
@@ -96,6 +110,7 @@ builder.add_node("supervisor", supervisor)
 builder.add_node("general", general_graph)
 builder.add_node("coding", coding_graph)
 builder.add_node("research", research_graph)
+builder.add_node("writing", writing_graph)
 
 builder.add_edge(START, "supervisor")
 builder.add_conditional_edges(
@@ -104,12 +119,14 @@ builder.add_conditional_edges(
     {
         "general": "general",
         "coding": "coding",
-        "research": "research"
+        "research": "research",
+        "writing": "writing",
     }
 )
 builder.add_edge("general", END)
 builder.add_edge("coding", END)
 builder.add_edge("research", END)
+builder.add_edge("writing", END)
 
 
 main_graph = builder.compile(checkpointer=checkpointer)

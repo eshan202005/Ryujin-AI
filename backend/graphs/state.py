@@ -9,7 +9,7 @@ class RyujinState(TypedDict):
 
     files: list[dict]
 
-    next : Literal["general", "coding", "research"]
+    next : Literal["general", "coding", "research", "writing"]
 
     # Coding Agent internal Worker ↔ ToolNode history
     coding_history: Annotated[list[BaseMessage], add_messages]
@@ -41,5 +41,16 @@ class RyujinState(TypedDict):
     research_decision: Literal["approved", "not_approved"]
     research_issues: list[str]
     research_iterations: int
+
+    # Writing Agent planner output
+    writing_task_type: Literal["create", "revise", "proofread"]
+    writing_plan: list[str]
+    writing_audience: str
+    writing_tone: str
+    writing_format: str
+    writing_draft: str
+    writing_decision: Literal["approved", "not_approved"]
+    writing_issues: list[str]
+    writing_iterations: int
 
     
