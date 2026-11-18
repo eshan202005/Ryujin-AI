@@ -1,10 +1,7 @@
-from backend.graphs.checkpointer import (
-    checkpointer,
-    run_async,
-)
+import os
 
 
-async def _load_persisted_conversations():
+async def _load_persisted_conversations(checkpointer):
 
     threads = {}
 
@@ -150,6 +147,19 @@ async def _load_persisted_conversations():
 
 def load_persisted_conversations():
 
+    # Streamlit and FastAPI run as separate services in deployment, so the
+    # frontend cannot read the backend's local SQLite checkpointer directly.
+    # Loading old conversations can be added later through an authenticated API.
+    if os.getenv("RYUJIN_API_URL"):
+        return {}
+
+    try:
+        from backend.graphs.checkpointer import checkpointer, run_async
+    except ModuleNotFoundError as error:
+        if error.name != "backend":
+            raise
+        return {}
+
     return run_async(
-        _load_persisted_conversations()
+        _load_persisted_conversations(checkpointer)
     )
