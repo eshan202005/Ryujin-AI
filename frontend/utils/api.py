@@ -1,6 +1,8 @@
+import os
+
 import requests
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = os.getenv("RYUJIN_API_URL", "http://127.0.0.1:8001").rstrip("/")
 
 
 def stream_chat(message: str, thread_id: str): #used to send send the msg and thread_id to backend and get reponse in chunks and get displayed
@@ -21,9 +23,6 @@ def stream_chat(message: str, thread_id: str): #used to send send the msg and th
     ):
         if chunk:
             yield chunk
-
-
-BASE_URL = "http://127.0.0.1:8000"
 
 
 def upload_file(file, thread_id: str):

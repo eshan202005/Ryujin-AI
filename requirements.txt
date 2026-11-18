@@ -1,0 +1,27 @@
+# API server
+fastapi
+uvicorn[standard]
+
+# Streamlit frontend and HTTP client
+streamlit
+requests
+
+# LangChain and LangGraph workflows
+langchain-core
+langchain-community
+langchain-experimental
+langchain-openai
+langchain-text-splitters
+langchain-chroma
+langgraph
+langgraph-checkpoint-sqlite
+
+# Persistence, configuration, and document loading
+aiosqlite
+python-dotenv
+pydantic
+pypdf
+
+# Search integrations used by the agents
+duckduckgo-search
+wikipedia
