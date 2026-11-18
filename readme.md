@@ -10,6 +10,7 @@ Ryujin AI is a Python-based multi-agent assistant with a Streamlit interface, a 
 - **General assistant tools:** calculator, unit conversion, current date and time, web search, and Wikipedia lookup.
 - **Coding assistant:** code generation, debugging, and explanation, with Python execution, test-command, and web-search tools. The workflow includes planning and review steps.
 - **Research assistant:** research planning and review, with web search, Wikipedia, and retrieval from PDFs uploaded to the active conversation.
+- **Writing assistant:** creates, revises, and proofreads content through planning, drafting, review, and revision workflows.
 - **PDF upload and retrieval:** documents are split into chunks and stored in Chroma with file metadata. Retrieval filters by the file IDs associated with the current conversation.
 - **LangSmith tracing:** inspect LangGraph runs, agent routing, model calls, and writing review cycles.
 - **Custom Streamlit UI:** Ryujin theme, chat interface, conversation sidebar, and document list.
@@ -44,14 +45,14 @@ frontend/
 Install the Python packages used by the project, set `OPENAI_API_KEY` in your environment, then start the backend and frontend in separate terminals from the project root:
 
 ```bash
-uvicorn backend.main:app --reload
+python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8001
 ```
 
 ```bash
 streamlit run frontend/app.py
 ```
 
-The frontend sends API requests to `http://127.0.0.1:8000`. The current code does not include a dependency manifest, so install the project’s required packages separately.
+The frontend sends API requests to `http://127.0.0.1:8001`. The current code does not include a dependency manifest, so install the project’s required packages separately.
 
 ## Current development focus
 

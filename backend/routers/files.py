@@ -87,4 +87,4 @@ async def upload_file(
         "file_type": file.content_type,
     }
 #in simples words the second part of the code just addes the files data into the files state in the 
-# thread_id  given so taht the files data reaces the garaph
+# thread_id  given so taht the files data reaches the garaph
