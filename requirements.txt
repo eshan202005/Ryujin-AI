@@ -23,5 +23,5 @@ pydantic
 pypdf
 
 # Search integrations used by the agents
-duckduckgo-search
+ddgs
 wikipedia
