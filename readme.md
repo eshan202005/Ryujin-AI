@@ -11,6 +11,7 @@ Ryujin AI is a Python-based multi-agent assistant with a Streamlit interface, a 
 - **Coding assistant:** code generation, debugging, and explanation, with Python execution, test-command, and web-search tools. The workflow includes planning and review steps.
 - **Research assistant:** research planning and review, with web search, Wikipedia, and retrieval from PDFs uploaded to the active conversation.
 - **PDF upload and retrieval:** documents are split into chunks and stored in Chroma with file metadata. Retrieval filters by the file IDs associated with the current conversation.
+- **LangSmith tracing:** inspect LangGraph runs, agent routing, model calls, and writing review cycles.
 - **Custom Streamlit UI:** Ryujin theme, chat interface, conversation sidebar, and document list.
 
 ## Tech stack
