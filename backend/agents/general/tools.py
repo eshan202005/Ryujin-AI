@@ -2,10 +2,10 @@ from datetime import datetime
 
 from langchain_core.tools import tool
 from langchain_community.tools import (
-    DuckDuckGoSearchRun,
     WikipediaQueryRun,
 )
 from langchain_community.utilities import WikipediaAPIWrapper
+from backend.agents.search import search_tool
 
 @tool
 def calculator_tool(a: float, b: float, operation: str) -> float:
@@ -28,7 +28,6 @@ def calculator_tool(a: float, b: float, operation: str) -> float:
     else:
         return 0
     
-search_tool = DuckDuckGoSearchRun()    
 
 wikipedia_tool = WikipediaQueryRun(
     api_wrapper=WikipediaAPIWrapper(

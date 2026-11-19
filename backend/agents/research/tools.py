@@ -4,10 +4,10 @@ from typing import Annotated
 from langgraph.prebuilt import InjectedState
 
 from langchain_community.tools import (
-    DuckDuckGoSearchRun,
     WikipediaQueryRun,
 )
 from langchain_community.utilities import WikipediaAPIWrapper
+from backend.agents.search import search_tool
 
 from backend.rag.vector_store import get_file_retriever
 @tool
@@ -41,7 +41,6 @@ def rag_search(
         ]
     )
 
-search_tool = DuckDuckGoSearchRun()    
 
 wikipedia_tool = WikipediaQueryRun(
     api_wrapper=WikipediaAPIWrapper(

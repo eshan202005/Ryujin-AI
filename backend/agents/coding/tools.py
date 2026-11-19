@@ -1,5 +1,5 @@
 from langchain_core.tools import tool
-from langchain_community.tools import DuckDuckGoSearchRun
+from backend.agents.search import search_tool
 from langchain_experimental.utilities import PythonREPL
 
 
@@ -54,4 +54,3 @@ def run_tests(test_command: str) -> str:
 # Web Search Tool
 # --------------------------------------------------
 
-search_tool = DuckDuckGoSearchRun()
