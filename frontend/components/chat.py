@@ -1,4 +1,5 @@
 import streamlit as st
+from utils.helpers import LOGO_IMAGE
 
 
 # ==========================================================
@@ -11,15 +12,16 @@ def render_welcome():
         """
 <div class="welcome-card">
 
-<h2>Welcome to Ryujin AI</h2>
+<div class="welcome-eyebrow">ONE WORKSPACE. MANY POSSIBILITIES.</div>
+<h2>Ideas into answers.</h2>
 
 <p class="welcome-subtitle">
-Your intelligent multi-agent assistant.
+Research, code, and create with Ryujin.
 </p>
 
 <p class="welcome-description">
-Ryujin automatically selects the best agents and tools
-for every request.
+Bring a question, a document, or your next idea.
+Ryujin selects the right agent for your request.
 </p>
 
 <div class="capability-list">
@@ -33,7 +35,7 @@ for every request.
 </div>
 
 <div class="capability-item">
-📄 <span>Resume Chat</span>
+✍ <span>Writing</span>
 </div>
 
 <div class="capability-item">
@@ -41,7 +43,7 @@ for every request.
 </div>
 
 <div class="capability-item">
-⚡ <span>AI Workflows</span>
+📄 <span>Document Chat</span>
 </div>
 
 </div>
@@ -64,12 +66,18 @@ def render_messages(messages): #used to render the messages in the chat window
         if not message["content"]:
             continue
 
-        avatar = "👤" if message["role"] == "user" else "🐉"
+        avatar = "👤" if message["role"] == "user" else (
+            str(LOGO_IMAGE) if LOGO_IMAGE.exists() else "🐉"
+        )
 
         with st.chat_message(
             message["role"],
             avatar=avatar,
         ):
+            if message["role"] == "user":
+                st.html('<span class="user-message-marker" aria-hidden="true"></span>')
+            if message["role"] == "assistant":
+                st.markdown('<div class="assistant-label">Ryujin</div>', unsafe_allow_html=True)
             st.markdown(message["content"])
 
 

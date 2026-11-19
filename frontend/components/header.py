@@ -1,4 +1,5 @@
 from datetime import datetime
+from html import escape
 import streamlit as st
 
 
@@ -39,6 +40,11 @@ def render_header():
         show_header = len(conversation["messages"]) == 0
 
     if not show_header:
+        st.markdown(
+            f'<div class="conversation-heading"><h1>{escape(str(conversation["name"]))}</h1>'
+            '<p>Your AI workspace</p></div>',
+            unsafe_allow_html=True,
+        )
         return
 
     st.markdown(
@@ -46,11 +52,11 @@ def render_header():
 <div class="hero">
 
 <div class="hero-title">
-{get_greeting()}, Eshan 👋
+{get_greeting()}
 </div>
 
 <div class="hero-subtitle">
-What shall we build today?
+What would you like to create today?
 </div>
 
 </div>

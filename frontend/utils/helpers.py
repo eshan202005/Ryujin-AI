@@ -35,6 +35,7 @@ def load_css():
         "chat.css",
         "input.css",
         "animations.css",
+        "polish.css",
     ]
 
     css = ""
@@ -90,13 +91,15 @@ def set_background():
 .stApp{{
 background:
 linear-gradient(
-rgba(4,4,8,.40),
-rgba(8,6,16,.40)
+90deg,
+rgba(10,7,17,.96) 0%,
+rgba(15,9,25,.88) 45%,
+rgba(20,10,32,.68) 100%
 ),
 url("data:image/png;base64,{img}");
 
 background-size:cover;
-background-position:center;
+background-position:right center;
 background-repeat:no-repeat;
 background-attachment:fixed;
 }}

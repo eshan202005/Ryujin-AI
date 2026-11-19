@@ -1,6 +1,7 @@
 import streamlit as st
 
 from utils.api import stream_chat
+from utils.helpers import LOGO_IMAGE
 
 
 def process_pending_prompt():
@@ -16,7 +17,8 @@ def process_pending_prompt():
         st.session_state.current_thread
     ]
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar=str(LOGO_IMAGE) if LOGO_IMAGE.exists() else "🐉"):
+        st.markdown('<div class="assistant-label">Ryujin</div>', unsafe_allow_html=True)
         response = st.write_stream(     #displays the response from backend in chunks as it is being generated
             stream_chat(
                 message=prompt,
