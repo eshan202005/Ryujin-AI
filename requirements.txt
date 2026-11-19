@@ -14,10 +14,10 @@ langchain-openai
 langchain-text-splitters
 langchain-chroma
 langgraph
-langgraph-checkpoint-sqlite
+langgraph-checkpoint-postgres
 
 # Persistence, configuration, and document loading
-aiosqlite
+psycopg[binary,pool]
 python-dotenv
 pydantic
 pypdf

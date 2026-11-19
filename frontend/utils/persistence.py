@@ -148,7 +148,7 @@ async def _load_persisted_conversations(checkpointer):
 def load_persisted_conversations():
 
     # Streamlit and FastAPI run as separate services in deployment, so the
-    # frontend cannot read the backend's local SQLite checkpointer directly.
+    # history access must go through an authenticated backend API.
     # Loading old conversations can be added later through an authenticated API.
     if os.getenv("RYUJIN_API_URL"):
         return {}
