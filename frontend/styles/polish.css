@@ -11,9 +11,20 @@
 
 .stApp { background-color: #0e0a15; }
 [data-testid="stHeader"] { background: rgba(13, 9, 20, .88); }
+.stMainBlockContainer,
+.stBottomBlockContainer,
+[data-testid="stMain"] .block-container,
+[data-testid="stBottom"] .block-container,
+[data-testid="stBottomBlockContainer"] {
+    width: 100% !important;
+    max-width: 1120px !important;
+    box-sizing: border-box !important;
+    margin-inline: auto !important;
+    padding-inline: 3rem !important;
+}
+.stMainBlockContainer,
 [data-testid="stMain"] .block-container {
-    max-width: 1120px;
-    padding: 2.5rem 3rem 3rem;
+    padding-block: 2.5rem 3rem;
 }
 [data-testid="stVerticalBlock"] { gap: 1.15rem !important; }
 [data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: .85rem !important; }
@@ -196,7 +207,9 @@ section[data-testid="stSidebar"] .stButton > button p { color: #e4d9ee; font-siz
 .hero-title { font-size: clamp(1.9rem, 4vw, 3rem); font-family: Georgia, serif; letter-spacing: -.025em; }
 .hero-subtitle { font-size: 1rem; color: #c5b5d6; }
 .welcome-card {
-    max-width: 760px;
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
     margin: 1rem 0 2rem;
     padding: 2rem;
     text-align: left;
@@ -217,6 +230,11 @@ section[data-testid="stSidebar"] .stButton > button p { color: #e4d9ee; font-siz
 ::-webkit-scrollbar-thumb { background: #574164; }
 
 @media (max-width: 768px) {
+    .stMainBlockContainer,
+    .stBottomBlockContainer,
+    [data-testid="stMain"] .block-container,
+    [data-testid="stBottom"] .block-container,
+    [data-testid="stBottomBlockContainer"] { padding-inline: 1rem !important; }
     [data-testid="stMain"] .block-container { padding: 1.5rem 1rem 2rem; }
     [data-testid="stBottomBlockContainer"],
     [data-testid="stBottom"] .block-container { padding: .6rem 1rem 1rem; }
