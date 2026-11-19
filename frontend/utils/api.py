@@ -43,4 +43,4 @@ def upload_file(file, thread_id: str):
 
     response.raise_for_status()
 
-    return response.json()
+    return response.json()# GETS THE RESPONSE
