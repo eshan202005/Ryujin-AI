@@ -1,4 +1,5 @@
 import streamlit as st
+from requests.exceptions import RequestException
 
 from utils.api import stream_chat
 from utils.helpers import LOGO_IMAGE
@@ -11,27 +12,42 @@ def process_pending_prompt():
     prompt = st.session_state.pending_prompt
 
     if prompt is None:
+        st.session_state.is_generating = False
         return
+
+    # Consume this prompt before starting I/O so a rerun cannot resubmit it.
+    st.session_state.pending_prompt = None
 
     conversation = st.session_state.conversations[
         st.session_state.current_thread
     ]
 
-    with st.chat_message("assistant", avatar=str(LOGO_IMAGE) if LOGO_IMAGE.exists() else "🐉"):
-        st.markdown('<div class="assistant-label">Ryujin</div>', unsafe_allow_html=True)
-        response = st.write_stream(     #displays the response from backend in chunks as it is being generated
-            stream_chat(
-                message=prompt,
-                thread_id=conversation["thread_id"],
+    status = st.status("Connecting to Ryujin...", expanded=False)
+    last_label = None
+
+    def show_status(label):
+        nonlocal last_label
+        if label != last_label:
+            status.update(label=label, state="running")
+            status.write(label)
+            last_label = label
+
+    try:
+        with st.chat_message("assistant", avatar=str(LOGO_IMAGE) if LOGO_IMAGE.exists() else "🐉"):
+            st.markdown('<div class="assistant-label">Ryujin</div>', unsafe_allow_html=True)
+            response = st.write_stream(
+                stream_chat(
+                    message=prompt,
+                    thread_id=conversation["thread_id"],
+                    on_status=show_status,
+                )
             )
-        )
 
-    conversation["messages"].append(    #then stores the response from backend inside the messages list of the conversation dict with role as assistant and content as the response
-        { 
-            "role": "assistant",
-            "content": response,
-        }
-    )
-
-    st.session_state.pending_prompt = None  #this makes the pending prompt to none so that it does not get processed again and again
-    st.session_state.is_generating = False #this stops the chat processor from running again and again and only runs when a new prompt is given
+        conversation["messages"].append({"role": "assistant", "content": response})
+        status.update(label="Response ready", state="complete", expanded=False)
+    except (RequestException, RuntimeError, ValueError) as error:
+        status.update(label="Response interrupted", state="error", expanded=True)
+        status.write("The request could not be completed. You can send another message.")
+        st.error(str(error))
+    finally:
+        st.session_state.is_generating = False

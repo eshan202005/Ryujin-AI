@@ -25,6 +25,7 @@ async def stream_chat_endpoint(request: ChatRequest):
         stream_chat(
             request.message,
             request.thread_id,
+            include_status=request.include_status,
         ),
-        media_type="text/plain",
+        media_type="application/x-ndjson" if request.include_status else "text/plain",
     )

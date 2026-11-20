@@ -14,7 +14,12 @@ load_dotenv()
 
 MAX_WRITING_REVISIONS = 3
 
-llm = ChatOpenAI(model="gpt-5-mini")
+llm = ChatOpenAI(
+    model="gpt-5-mini",
+    reasoning_effort="low",
+    timeout=90,
+    max_retries=0,
+)
 
 
 class WritingPlan(BaseModel):
@@ -30,11 +35,21 @@ class WritingReview(BaseModel):
     issues: list[str]
 
 
-planner_llm = llm.with_structured_output(WritingPlan)
-reviewer_llm = ChatOpenAI(model="gpt-5.4-nano").with_structured_output(
+planner_llm = ChatOpenAI(
+    model="gpt-5-mini",
+    reasoning_effort="minimal",
+    max_tokens=4096,
+    timeout=45,
+    max_retries=0,
+).with_structured_output(WritingPlan, method="function_calling")
+reviewer_llm = ChatOpenAI(
+    model="gpt-5.4-nano", timeout=45, max_retries=0
+).with_structured_output(
     WritingReview
 )
-finalizer_llm = ChatOpenAI(model="gpt-5-mini")
+finalizer_llm = ChatOpenAI(
+    model="gpt-5-mini", reasoning_effort="minimal", timeout=60, max_retries=0
+)
 
 
 def initialize_writing_state(state: RyujinState) -> RyujinState:
@@ -69,6 +84,7 @@ content. If any are not specified and cannot be reasonably inferred, use
 "Not specified". Create steps that capture the user's requirements, including
 any requested length, structure, or constraints.
 
+Keep the plan concise, with at most five short steps.
 Do not write or revise the requested content. Only return the structured plan.
 """
         ),
