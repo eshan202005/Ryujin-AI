@@ -8,9 +8,9 @@ from utils.api import upload_file
 
 def render_sidebar():
     with st.container(key="sidebar_brand"):
-        logo, text = st.columns([1, 3], gap="small", vertical_alignment="center")
+        logo, text = st.columns([1.05, 3], gap="small", vertical_alignment="center")
         with logo:
-            show_logo(width=56)
+            show_logo(width=60)
         with text:
             st.markdown(
                 '<div class="logo-title">RYUJIN <span class="logo-ai">AI</span></div>'

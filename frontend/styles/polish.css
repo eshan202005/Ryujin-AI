@@ -245,10 +245,40 @@ section[data-testid="stSidebar"] .stButton > button p { color: #e4d9ee; font-siz
     .conversation-heading { margin-bottom: .8rem; }
 }
 /* Sidebar: independent conversation and file scroll areas. */
-section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] { padding: 1rem .75rem; }
+section[data-testid="stSidebar"] {
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+    padding: 0 !important;
+}
+/* Only the user-content layer provides padding; do not inset each wrapper. */
+section[data-testid="stSidebar"] > div,
+section[data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+    padding: 0 !important;
+}
+section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+    padding: 1rem 1.1rem 1.25rem !important;
+}
+section[data-testid="stSidebar"] .sidebar-section {
+    font-size: .72rem;
+    letter-spacing: .12em;
+    margin: .35rem 0;
+}
+/* Override the native container's inline height with a viewport-sized scroll
+   region. The Documents block remains outside this region. */
+section[data-testid="stSidebar"] .st-key-sidebar_conversations {
+    height: clamp(150px, calc(100dvh - 440px), 460px) !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+}
+section[data-testid="stSidebar"] .st-key-sidebar_files {
+    height: 96px !important;
+    overflow-y: auto !important;
+}
 section[data-testid="stSidebar"] .st-key-sidebar_brand { padding-bottom: .4rem; }
-section[data-testid="stSidebar"] .logo-title { font-size: 1.28rem; letter-spacing: .015em; }
-section[data-testid="stSidebar"] .logo-subtitle { margin-top: .25rem; font-size: .73rem; }
+section[data-testid="stSidebar"] .logo-title { font-size: 1.35rem; letter-spacing: .015em; white-space: nowrap; }
+section[data-testid="stSidebar"] .logo-subtitle { margin-top: .25rem; font-size: .78rem; }
 section[data-testid="stSidebar"] .st-key-sidebar_brand .stButton > button {
     justify-content: center;
     min-height: 44px !important;
@@ -278,12 +308,12 @@ section[data-testid="stSidebar"] [class*="st-key-conversation_"] button p {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 185px;
-    font-size: .86rem;
+    max-width: 205px;
+    font-size: .92rem;
 }
-.sidebar-empty { color: #9e8eae; font-size: .82rem; line-height: 1.8; padding: .55rem; }
+.sidebar-empty { color: #ae9fbc; font-size: .88rem; line-height: 1.7; padding: .4rem .55rem; }
 .st-key-sidebar_documents { border-top: 1px solid #3d294b; padding-top: 1rem; }
-.sidebar-document-note { color: #9e8cac; font-size: .7rem; line-height: 1.5; }
+.sidebar-document-note { color: #ad9abb; font-size: .75rem; line-height: 1.5; }
 .st-key-sidebar_documents [data-testid="stFileUploader"] { border-color: #6e4a84; padding: .15rem; }
 .st-key-sidebar_documents [data-testid="stFileUploaderDropzone"] { padding: .6rem; }
 .st-key-sidebar_documents [data-testid="stFileUploaderDropzone"] button {
@@ -299,6 +329,16 @@ section[data-testid="stSidebar"] [class*="st-key-conversation_"] button p {
     /* Retain a usable outer sidebar scroll on short screens. */
     section[data-testid="stSidebar"] .st-key-sidebar_documents { padding-top: .65rem; }
     section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: .55rem !important; }
+}
+@media (max-width: 640px) {
+    section[data-testid="stSidebar"] {
+        width: min(300px, 88vw) !important;
+        min-width: min(300px, 88vw) !important;
+        max-width: min(300px, 88vw) !important;
+    }
+    section[data-testid="stSidebar"] .st-key-sidebar_conversations {
+        height: clamp(140px, calc(100dvh - 430px), 300px) !important;
+    }
 }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
