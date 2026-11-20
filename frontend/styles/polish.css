@@ -244,6 +244,62 @@ section[data-testid="stSidebar"] .stButton > button p { color: #e4d9ee; font-siz
     .hero { margin: .5rem 0; }
     .conversation-heading { margin-bottom: .8rem; }
 }
+/* Sidebar: independent conversation and file scroll areas. */
+section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] { padding: 1rem .75rem; }
+section[data-testid="stSidebar"] .st-key-sidebar_brand { padding-bottom: .4rem; }
+section[data-testid="stSidebar"] .logo-title { font-size: 1.28rem; letter-spacing: .015em; }
+section[data-testid="stSidebar"] .logo-subtitle { margin-top: .25rem; font-size: .73rem; }
+section[data-testid="stSidebar"] .st-key-sidebar_brand .stButton > button {
+    justify-content: center;
+    min-height: 44px !important;
+    margin-top: .55rem;
+    background: linear-gradient(110deg, #a161dd, #8445c6) !important;
+}
+section[data-testid="stSidebar"] .st-key-sidebar_conversations [data-testid="stVerticalBlock"] {
+    gap: .3rem !important;
+}
+section[data-testid="stSidebar"] [class*="st-key-conversation_"] button {
+    justify-content: flex-start;
+    min-height: 41px !important;
+    padding: .6rem .7rem;
+    border: 1px solid transparent !important;
+    border-radius: 9px !important;
+    background: transparent !important;
+}
+section[data-testid="stSidebar"] [class*="st-key-conversation_"] button[kind="primary"] {
+    background: #392147 !important;
+    border-color: rgba(181, 123, 223, .17) !important;
+    box-shadow: inset 3px 0 0 #b57ce9 !important;
+}
+section[data-testid="stSidebar"] [class*="st-key-conversation_"] button:hover {
+    background: #25192e !important;
+}
+section[data-testid="stSidebar"] [class*="st-key-conversation_"] button p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 185px;
+    font-size: .86rem;
+}
+.sidebar-empty { color: #9e8eae; font-size: .82rem; line-height: 1.8; padding: .55rem; }
+.st-key-sidebar_documents { border-top: 1px solid #3d294b; padding-top: 1rem; }
+.sidebar-document-note { color: #9e8cac; font-size: .7rem; line-height: 1.5; }
+.st-key-sidebar_documents [data-testid="stFileUploader"] { border-color: #6e4a84; padding: .15rem; }
+.st-key-sidebar_documents [data-testid="stFileUploaderDropzone"] { padding: .6rem; }
+.st-key-sidebar_documents [data-testid="stFileUploaderDropzone"] button {
+    background: #2a1b36;
+    border: 1px solid #65437b;
+    color: #eee0f9;
+    border-radius: 8px;
+}
+.st-key-sidebar_files .file-card { padding: .6rem .7rem; font-size: .78rem; background: #25172f; }
+.st-key-sidebar_files [data-testid="stVerticalBlock"] { gap: .4rem !important; }
+.st-key-sidebar_conversations, .st-key-sidebar_files { scrollbar-width: thin; scrollbar-color: #6b467f transparent; }
+@media (max-height: 760px) {
+    /* Retain a usable outer sidebar scroll on short screens. */
+    section[data-testid="stSidebar"] .st-key-sidebar_documents { padding-top: .65rem; }
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: .55rem !important; }
+}
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
 }
